@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.87"
+    ComputedModelVersion    "1.88"
     NumModelReferences	    0
     NumTestPointedSignals   0
     NumProvidedFunctions    0
@@ -140,9 +140,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "Sam"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Thu May 17 22:19:44 2018"
-  RTWModifiedTimeStamp	  448496383
-  ModelVersionFormat	  "1.%<AutoIncrement:87>"
+  LastModifiedDate	  "Thu May 17 22:58:33 2018"
+  RTWModifiedTimeStamp	  448498709
+  ModelVersionFormat	  "1.%<AutoIncrement:88>"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
   LibraryLinkDisplay	  "none"
@@ -1930,7 +1930,7 @@ Model {
       Position		      [610, 435, 640, 465]
       ZOrder		      38
       BlockMirror	      on
-      Value		      "QUAD.ref"
+      Value		      "param.QUAD.ref"
     }
     Block {
       BlockType		      Constant
@@ -1954,7 +1954,7 @@ Model {
       SID		      "88"
       Position		      [770, -85, 800, -55]
       ZOrder		      292
-      Value		      "QUAD.ref"
+      Value		      "param.QUAD.ref"
     }
     Block {
       BlockType		      MATLABFcn
@@ -2314,7 +2314,7 @@ Model {
       Ports		      [1, 1]
       Position		      [470, 265, 500, 295]
       ZOrder		      -7
-      InitialCondition	      "QUAD.X0"
+      InitialCondition	      "param.QUAD.X0"
       Port {
 	PortNumber		1
 	Name			"[eta; nu]"

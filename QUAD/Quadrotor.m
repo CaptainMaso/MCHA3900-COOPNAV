@@ -21,12 +21,12 @@ param.QUAD.MRB = [param.QUAD.m*eye(3), -param.QUAD.m*param.QUAD.SrCBb;
 param.QUAD.DRB = diag([0.5, 0.5, 0.5, 0.05, 0.05, 0.05]);
           
 % ------------- Initial States
-QUAD.eta0 = [0,0,0,0,0,0]';
-QUAD.nu0 = [0,0,0,0,0,0]';
+param.QUAD.eta0 = [0,0,0,0,0,0]';
+param.QUAD.nu0 = [0,0,0,0,0,0]';
 
-QUAD.X0 = [QUAD.eta0;QUAD.nu0];
+param.QUAD.X0 = [param.QUAD.eta0;param.QUAD.nu0];
 
-QUAD.ref = [5,5,-10,deg2rad(45)];
+param.QUAD.ref = [5,5,-10,deg2rad(45)];
 % ------------- Controller Parameters
 param.QUAD.kx = 5;
 param.QUAD.kv = 5;
