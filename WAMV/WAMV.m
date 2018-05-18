@@ -43,7 +43,7 @@ COr = ctrb(param.Ar,param.Br);
 assert(rank(COr) == min(size(COr)),'System not controllable!')
 
 %% LQR control design
-Q = diag([10,0.1,0.1,1,0.1,1]);
+Q = diag([0.001,0.1,0.1,1,0.1,1]);
 R = eye(3);
 
 Sysr = ss(param.Ar, param.Br, param.Cr, param.Dr);
@@ -51,7 +51,7 @@ Sysr = ss(param.Ar, param.Br, param.Cr, param.Dr);
 
 % Initial and final conditions
 etai = [0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0];
-etad = [1; 0; 0; 0; 0; 0];
+etad = [1; 1; 0; 0; 0; 0];
 etad3 = etad(param.dofIdx); % Get desired eta for the 3 dof of choice
 
 %%
