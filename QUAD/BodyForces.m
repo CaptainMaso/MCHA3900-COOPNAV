@@ -8,11 +8,11 @@ nu = X(7:12);       % [u, v, w, p, q, r]'; (nu)
 
 % Calculations for body forces
 deta = eulerKinematicTransformation(eta)*nu;
-RBNb = eulerRotation(eta(4:6));
+Rnb = eulerRotation(eta(4:6));
 
-Taun = -param.QUAD.DRB*deta;
+Taun = -param.DRB*deta;
 
-Taun = Taun + [0;0;param.QUAD.m*param.g; 0; 0; 0];
+Taun = Taun + [0;0;param.m*param.g; 0; 0; 0];
 
 
-TauB = [RBNb'*Taun(1:3);Taun(4:6)];
+TauB = [Rnb'*Taun(1:3);Taun(4:6)];

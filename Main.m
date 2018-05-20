@@ -1,4 +1,4 @@
-clear all;
+clear variables;
 
 addpath('QUAD');
 addpath('WAMV');
