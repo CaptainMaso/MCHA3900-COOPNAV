@@ -4,6 +4,7 @@ addpath('QUAD');
 addpath('WAMV');
 addpath('AUV');
 addpath('Sensors');
+addpath('Common');
 
 global param map data
 %% Parameter Initialisation
@@ -65,3 +66,59 @@ end
 % Lol
 
 %% PLOT ALL THE THINGS (For now)
+% Plot states (True, est. mono, est. distributed)
+% First etas
+figure(1);
+
+% QUAD eta data
+subplot(3,3,1);
+plot(data.QUAD.raw.t, data.QUAD.raw.X(1,:));% data.QUAD.filtered.t, data.QUAD.filtered.
+grid on;
+title('N - QUAD');
+ylabel('Position NORTH (m)');
+legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+
+
+subplot(3,3,4);
+plot(data.QUAD.raw.t, data.QUAD.raw.X(2,:));% data.QUAD.filtered.t, data.QUAD.filtered.
+grid on;
+title('E - QUAD');
+ylabel('Position EAST (m)');
+legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+
+
+subplot(3,3,7);
+plot(data.QUAD.raw.t, data.QUAD.raw.X(3,:));% data.QUAD.filtered.t, data.QUAD.filtered.
+grid on;
+title('D - QUAD');
+ylabel('Position DOWN (m)');
+xlabel('Time (s)');
+legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+
+% -------------------- TODO  - ADD WAMV/AUV
+% First nus
+figure(2);
+
+subplot(3,3,1);
+plot(data.QUAD.raw.t, data.QUAD.raw.X(7,:));% data.QUAD.filtered.t, data.QUAD.filtered.
+grid on;
+title('U - QUAD');
+ylabel('Velocity NORTH (m)');
+legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+
+subplot(3,3,4);
+plot(data.QUAD.raw.t, data.QUAD.raw.X(8,:));% data.QUAD.filtered.t, data.QUAD.filtered.
+grid on;
+title('V - QUAD');
+ylabel('Velocity EAST (m)');
+legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+
+subplot(3,3,7);
+plot(data.QUAD.raw.t, data.QUAD.raw.X(9,:));% data.QUAD.filtered.t, data.QUAD.filtered.
+grid on;
+title('W - QUAD');
+ylabel('Velocity DOWN (m)');
+xlabel('Time (s)');
+legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+
+

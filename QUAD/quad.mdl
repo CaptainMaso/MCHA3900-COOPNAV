@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.88"
+    ComputedModelVersion    "1.91"
     NumModelReferences	    0
     NumTestPointedSignals   0
     NumProvidedFunctions    0
@@ -105,8 +105,8 @@ Model {
 	ViewObjType		"SimulinkTopLevel"
 	LoadSaveID		"0"
 	Extents			[1240.0, 866.0]
-	ZoomFactor		[1.0]
-	Offset			[-164.25757014332555, -235.05763766693354]
+	ZoomFactor		[0.8]
+	Offset			[-158.40757014332519, -225.35763766693378]
       }
       Object {
 	$PropName		"DockComponentsInfo"
@@ -140,9 +140,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "Sam"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Thu May 17 22:58:33 2018"
-  RTWModifiedTimeStamp	  448498709
-  ModelVersionFormat	  "1.%<AutoIncrement:88>"
+  LastModifiedDate	  "Sun May 20 17:27:30 2018"
+  RTWModifiedTimeStamp	  448738049
+  ModelVersionFormat	  "1.%<AutoIncrement:91>"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
   LibraryLinkDisplay	  "none"
@@ -1841,7 +1841,7 @@ Model {
     TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
     TiledPageScale	    1
     ShowPageBoundaries	    off
-    ZoomFactor		    "100"
+    ZoomFactor		    "80"
     ReportName		    "simulink-default.rpt"
     SIDHighWatermark	    "94"
     Block {
@@ -1852,7 +1852,7 @@ Model {
       Position		      [375, 192, 455, 228]
       ZOrder		      31
       BlockMirror	      on
-      MATLABFcn		      "BodyForces"
+      MATLABFcn		      "quadFBb"
       OutputDimensions	      "6"
       Port {
 	PortNumber		1
@@ -1964,7 +1964,7 @@ Model {
       Position		      [400, 442, 480, 478]
       ZOrder		      21
       BlockMirror	      on
-      MATLABFcn		      "Controller"
+      MATLABFcn		      "quadCTRL"
       OutputDimensions	      "4"
       Port {
 	PortNumber		1
@@ -2280,7 +2280,7 @@ Model {
       Ports		      [1, 1]
       Position		      [385, 265, 445, 295]
       ZOrder		      -3
-      MATLABFcn		      "detanu"
+      MATLABFcn		      "quad_detanu"
       OutputDimensions	      "12"
     }
     Block {
@@ -2709,7 +2709,7 @@ Model {
       Ports		      [1, 1]
       Position		      [215, 252, 295, 288]
       ZOrder		      13
-      MATLABFcn		      "actuatorModel"
+      MATLABFcn		      "quadActFBb"
       OutputDimensions	      "6"
       Port {
 	PortNumber		1
@@ -2724,7 +2724,7 @@ Model {
       Position		      [215, 442, 295, 478]
       ZOrder		      14
       BlockMirror	      on
-      MATLABFcn		      "controlAllocation"
+      MATLABFcn		      "quadCtrlAlloc"
       OutputDimensions	      "4"
       Port {
 	PortNumber		1
