@@ -15,9 +15,10 @@ Rnb = eulerRotation(thetanb); %-> Rnb is the rotation matrix from body to NED co
 
 %Accelerometer
 a = [dnu(1);dnu(2);dnu(3)];      %NED accelerations
+Rmb = eye(3); %-> IMU is at COG for vessel
 abias = [1;1;1];
 anoise = param.IMU.accsigma*randn(3,1);
-aimu = (Rnb*eta(4:6))'*(a + gn) + abias + anoise; %from torques
+aimu = Rmb*dnu + Rmb*(skew(nu(4:6))*nu(1:3)-Rnb'*gn) + abias + anoise;
 
 %Gyro
 wbias = [1;1;1];

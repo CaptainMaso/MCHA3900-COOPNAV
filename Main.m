@@ -18,7 +18,7 @@ param.sensor_sample_rate = 10;  % Sample rate (Hz)
 param.LPS.sigma = 0.1;          % Noise on LPS data (m)
 
 % ---- Visual Bearing (VB) parameters
-param.VB.sigma = diag([0.1, 0.1, 0.1]);          % Noise on VB data (m)
+param.VB.sigma = diag([0.1, 0.1, 0.1]);          % Noise on VB data (rad)
 
 % --- Simulation Parameters
 param.tf = 30;
