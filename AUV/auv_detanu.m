@@ -3,45 +3,41 @@ function dx = auv_detanu(in)
 global param
 pauv = param.AUV;
 
-tau5 = in(1:5);  % X, Y, Z, N
-eta5 = in(6:10);  % N, E, D, psi
-nu5  = in(11:15);  % u, v, w, p, r
-vc  = in(16:18);  % irrotational underwater current disturbances
-etabar = in(18:22); % pose disturbances
-
-nu5r = nu5 + [vc;0;0];
-eta5 = eta5 + etabar;
-% Pad eta with zeros
-eta = zeros(6,1);
-eta(pauv.dofIdx) = eta5;            % N, E, D, phi, theta, psi
+tau6 = in(1:6);  % X, Y, Z, N
+eta6 = in(7:12);  % N, E, D, psi
+nu6  = in(13:18);  % u, v, w, p, r
+u = nu6(1); v = nu6(2); w = nu6(3); p = nu6(4); q = nu6(5); r = nu6(6);
 
 % Obtain kinematic transformation for DOF of interest
-J = eulerKinematicTransformation(eta);
-J5 = J(pauv.dofIdx,pauv.dofIdx);
+J = eulerKinematicTransformation(eta6);
 
-omegaBNb = [in(14); 0;  in(15)];
-SomegaBNb = skew(omegaBNb);
+CRB = [
+[                 0,                         -pauv.m*r,               pauv.m*q, pauv.m*q*pauv.yg + pauv.m*r*pauv.zg,         -pauv.m*q*pauv.xg,         -pauv.m*r*pauv.xg];
+[               pauv.m*r,                       0,              -pauv.m*p,         -pauv.m*p*pauv.yg, pauv.m*p*pauv.xg + pauv.m*r*pauv.zg,         -pauv.m*r*pauv.yg];
+[              -pauv.m*q,                      pauv.m*p,                 0,         -pauv.m*p*pauv.zg,         -pauv.m*q*pauv.zg, pauv.m*p*pauv.xg + pauv.m*q*pauv.yg];
+[ - pauv.m*q*pauv.yg - pauv.m*r*pauv.zg,        pauv.m*p*pauv.yg,            pauv.m*p*pauv.zg,               0,          pauv.IBbz*r,         -pauv.IBby*q];
+[            pauv.m*q*pauv.xg,          - pauv.m*p*pauv.xg - pauv.m*r*pauv.zg,            pauv.m*q*pauv.zg,         -pauv.IBbz*r,               0,          pauv.IBbx*p];
+[            pauv.m*r*pauv.xg,            pauv.m*r*pauv.yg, - pauv.m*p*pauv.xg - pauv.m*q*pauv.yg,          pauv.IBby*q,         -pauv.IBbx*p,               0];
+ ];
+ 
+MA = diag([pauv.Xudot, pauv.Yvdot, pauv.Zwdot, pauv.Kpdot, pauv.Mqdot, pauv.Nrdot]);
 
-CRB = [pauv.m*SomegaBNb             -pauv.m*SomegaBNb*pauv.SrCBb;
-       pauv.m*pauv.SrCBb*SomegaBNb    -skew(pauv.IBb*omegaBNb)];
-   
-CRB5 = CRB(pauv.dofIdx,pauv.dofIdx);
-
-MA = diag([pauv.Xudot, pauv.Yvdot, pauv.Zwdot, pauv.Kpdot, pauv.Nrdot]);
-
-u = nu5r(1);    v = nu5r(2);    w = nu5r(3);
-
-CA = [[      0,            0,                         0,                    0,              pauv.Yvdot*v];
-    [        0,            0,                         0,             pauv.Zwdot*w,          -pauv.Xudot*u];
-    [        0,            0,                         0,             -pauv.Yvdot*v,                  0];
-    [        0,     -pauv.Zwdot*w,              pauv.Yvdot*v,               0,                       0];
-    [ -pauv.Yvdot*v,  pauv.Xudot*u,                  0,                     0                        0] ];
-
-Dm = diag([-pauv.Xu-pauv.Xauu*abs(nu5r(1)),-pauv.Yv-pauv.Yavv*abs(nu5r(2)),-pauv.Zw-pauv.Zaww*abs(nu5r(3)),-pauv.Kp-pauv.Kapp*abs(nu5r(4)),-pauv.Nr-pauv.Narr*abs(nu5r(5))]);                
+CA = [
+[        0,               0,             0,                0,       -pauv.Zwdot*w,          pauv.Yvdot*v];
+[        0,              0,              0,         pauv.Zwdot*w,        0,              -pauv.Xudot*u];
+[        0,               0,             0,         -pauv.Yvdot*v,  pauv.Xudot*u,               0];
+[        0,         -pauv.Zwdot*w,  pauv.Yvdot*v,        0,         -pauv.Nrdot*r,              pauv.Mqdot*q];
+[  pauv.Zwdot*w,        0,          -pauv.Xudot*u,   Npauv.rdot*r,        0,            -pauv.Kpdot*p];
+[ -pauv.Yvdot*v,     pauv.Xudot*u,        0,        -pauv.Mqdot*q,  pauv.Kpdot*p,            0]
+];
+ 
+Dm = diag([-pauv.Xu-pauv.Xauu*abs(u),-pauv.Yv-pauv.Yavv*abs(v),-pauv.Zw-pauv.Zaww*abs(w),-pauv.Kp-pauv.Kapp*abs(p),-pauv.Mq-pauv.Maqq*abs(q),-pauv.Nr-pauv.Narr*abs(r)]);
 
 NB = [0;0;0.2*9.81;0;0];      % Net bouyancy
-deta5 = J5*nu5r;
-dnu5 = inv(pauv.MRB5+MA)*(tau5 -(CRB5+CA)*nu5r - Dm*nu5r + NB);
+deta6 = J*nu6;
 
 
-dx = [deta5;dnu5];
+dnu6 = inv(pauv.MRB+MA)*(tau6 -(CRB+CA)*nu6 - Dm*nu6 + NB);
+
+
+dx = [deta6;dnu6];
