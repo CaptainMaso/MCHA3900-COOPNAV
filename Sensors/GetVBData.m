@@ -2,7 +2,7 @@ function y_VB = GetVBData(in)
 global map param
 
 eta = in(1:6);
-x = eta(1:3)
+x = eta(1:3);
 Theta = eta(4:6);
 RBNb = eulerRotation(Theta);
 
