@@ -1,6 +1,6 @@
 function B = actuatorConfiguration
-Ixi = 0.6;
-Iyi = 0.36;
+Ixi = 2;
+Iyi = 1;
 a1 = deg2rad(10);
 a2 = deg2rad(10);
 % Refer to the Thrust Configuration slide from the Week 2 Vehicle control slides

@@ -1,3 +1,4 @@
+
 %% UUV model in the horizontal plane
 global param
 
@@ -43,15 +44,15 @@ COr = ctrb(param.Ar,param.Br);
 assert(rank(COr) == min(size(COr)),'System not controllable!')
 
 %% LQR control design
-Q = diag([0.001,0.1,0.1,1,0.1,1]);
-R = eye(3);
+Q = diag([0.01,0.1,0.1,1,0.1,1]);
+R = eye(3).*0.5;
 
 Sysr = ss(param.Ar, param.Br, param.Cr, param.Dr);
 [K,S,E] = lqr(Sysr,Q,R,zeros(6,3));
 
 % Initial and final conditions
 etai = [0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0];
-etad = [1; 1; 0; 0; 0; 0];
+etad = [100; 0; 0; 0; 0; 0];
 etad3 = etad(param.dofIdx); % Get desired eta for the 3 dof of choice
 
 %%
