@@ -26,13 +26,13 @@ param.QUAD.nu0 = [0,0,0,0,0,0]';
 
 param.QUAD.X0 = [param.QUAD.eta0;param.QUAD.nu0];
 
-param.QUAD.ref = [5,5,-10,deg2rad(45)];
+param.QUAD.ref = [20,-10,-10,deg2rad(25)];
 % ------------- Controller Parameters
 param.QUAD.kx = 5;
 param.QUAD.kv = 5;
 
 param.QUAD.kr = 10;
-param.QUAD.kdr = 1;
+param.QUAD.kdr = 0.5;
 %% --------------- SIM QUAD
 sim('quad');
 

@@ -31,7 +31,8 @@ data.QUAD.raw.t = QUAD_states.Time';
 data.QUAD.raw.N = length(data.QUAD.raw.t);
 data.QUAD.raw.X = QUAD_states.Data(:, 1:12)';
 data.QUAD.raw.Taub = QUAD_states.Data(:, 13:18)';
-clear QUAD_states tout
+
+clearvars -except data param map
 
 % -- WAMV data
 % TODO: Implement this
@@ -68,57 +69,46 @@ end
 %% PLOT ALL THE THINGS (For now)
 % Plot states (True, est. mono, est. distributed)
 % First etas
-figure(1);
-
+f = figure(1);
 % QUAD eta data
-subplot(3,3,1);
-plot(data.QUAD.raw.t, data.QUAD.raw.X(1,:));% data.QUAD.filtered.t, data.QUAD.filtered.
-grid on;
-title('N - QUAD');
-ylabel('Position NORTH (m)');
-legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+columns = 3;
+rows = 6;
 
-
-subplot(3,3,4);
-plot(data.QUAD.raw.t, data.QUAD.raw.X(2,:));% data.QUAD.filtered.t, data.QUAD.filtered.
-grid on;
-title('E - QUAD');
-ylabel('Position EAST (m)');
-legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
-
-
-subplot(3,3,7);
-plot(data.QUAD.raw.t, data.QUAD.raw.X(3,:));% data.QUAD.filtered.t, data.QUAD.filtered.
-grid on;
-title('D - QUAD');
-ylabel('Position DOWN (m)');
-xlabel('Time (s)');
-legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+titles = {{'QUAD','NORTH'}, {'EAST'}, {'DOWN'}, {'ROLL '}, {'PITCH'}, {'YAW'}};
+ylabels = {'N (m)', 'E (m)', 'D (m)', '$\phi$ ($^{\circ}$)', '$\theta$ ($^{\circ}$)', '$\psi$ ($^{\circ}$)'};
+xlabels = {'','','','','','Time (s)'};
+scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
+for row=1:rows
+    subplot(6,3,(row-1)*columns + 1);
+    plot(data.QUAD.raw.t, data.QUAD.raw.X(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+    grid on;
+    t = titles(row);
+    title(t{:}, 'Interpreter', 'latex');
+    ylabel(ylabels(row), 'Interpreter', 'latex');
+    xlabel(xlabels(row), 'Interpreter', 'latex');
+    legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+end
 
 % -------------------- TODO  - ADD WAMV/AUV
 % First nus
 figure(2);
 
-subplot(3,3,1);
-plot(data.QUAD.raw.t, data.QUAD.raw.X(7,:));% data.QUAD.filtered.t, data.QUAD.filtered.
-grid on;
-title('U - QUAD');
-ylabel('Velocity NORTH (m)');
-legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+columns = 3;
+rows = 6;
 
-subplot(3,3,4);
-plot(data.QUAD.raw.t, data.QUAD.raw.X(8,:));% data.QUAD.filtered.t, data.QUAD.filtered.
-grid on;
-title('V - QUAD');
-ylabel('Velocity EAST (m)');
-legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+titles = {{'QUAD';'SURGE'}, 'SWAY', 'HEAVE', 'ROLL RATE', 'PITCH RATE', 'YAW RATE'};
+ylabels = {'U (m)', 'V (m)', 'W (m)', 'P ($^{\circ}$/s)', 'Q ($^{\circ}$/s)', 'R ($^{\circ}$/s)'};
+xlabels = {'','','','','','Time (s)'};
+scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
+for row=1:rows
+    subplot(6,3,(row-1)*columns + 1);
+    plot(data.QUAD.raw.t, data.QUAD.raw.X(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+    grid on;
+    t = titles(row);
+    title(t{:}, 'Interpreter', 'latex');
+    ylabel(ylabels(row), 'Interpreter', 'latex');
+    xlabel(xlabels(row), 'Interpreter', 'latex');
+    legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+end
 
-subplot(3,3,7);
-plot(data.QUAD.raw.t, data.QUAD.raw.X(9,:));% data.QUAD.filtered.t, data.QUAD.filtered.
-grid on;
-title('W - QUAD');
-ylabel('Velocity DOWN (m)');
-xlabel('Time (s)');
-legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
-
-
+clearvars -except data param map

@@ -21,5 +21,8 @@ sccprj/
 # Simulink autosave extension
 *.autosave
 
+# Simulink cache file
+*.slxc
+
 # Octave session info
 octave-workspace

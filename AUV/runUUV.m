@@ -78,72 +78,72 @@ etad5 = [0; 0; 0; 0; 5]; % Get desired eta for the 3 dof of choice
 eigABK = eig(MatrixAa - MatrixBa*K)
 disturbances_eta = zeros(5,1);
 sim('AUVsim')
-%% 
-IMUa = IMUdata(:,1:3);
-IMUg = IMUdata(:,4:6);
-IMUm = IMUdata(:,7:9);
-%
-[tsize,~] = size(etanu(:,1));
-refN = etad5(:,1);
-refE = etad5(:,2);
-refD = etad5(:,3);
-refphi = etad5(:,4);
-refpsi = etad5(:,5);
-
-close ALL HIDDEN
-
-figure(1);
-subplot(5,1,1)
-plot(etanu(:,1),etanu(:,2),etanu(:,1),refN)
-legend('State', 'Reference');
-title('N')
-
-subplot(5,1,2)
-plot(etanu(:,1),etanu(:,3),etanu(:,1),refE)
-legend('State', 'Reference');
-title('E')
-
-subplot(5,1,3)
-plot(etanu(:,1),etanu(:,4),etanu(:,1),refD)
-legend('State', 'Reference');
-title('D')
-
-subplot(5,1,4)
-plot(etanu(:,1),etanu(:,5),etanu(:,1),refphi)
-legend('State', 'Reference');
-title('phi (degrees)')
-
-subplot(5,1,5)
-plot(etanu(:,1),etanu(:,6),etanu(:,1),refpsi)
-legend('State', 'Reference');
-title('psi (degrees)')
-
-figure(2);
-subplot(5,1,1)
-plot(etanu(:,1),etanu(:,7))
-title('u')
-
-subplot(5,1,2)
-plot(etanu(:,1),etanu(:,8))
-title('v')
-
-subplot(5,1,3)
-plot(etanu(:,1),etanu(:,9))
-title('w')
-
-subplot(5,1,4)
-plot(etanu(:,1),etanu(:,10),etanu(:,1),IMUg(:,1))
-legend('true state','IMU data')
-title('p (degrees/s)')
-
-subplot(5,1,5)
-plot(etanu(:,1),etanu(:,11),etanu(:,1),IMUg(:,3))
-legend('true state','IMU data')
-title('r (degrees/s)')
-
+% %% 
+% % IMUa = IMUdata(:,1:3);
+% % IMUg = IMUdata(:,4:6);
+% % IMUm = IMUdata(:,7:9);
+% %
+% [tsize,~] = size(etanu(:,1));
+% refN = etad5(:,1);
+% refE = etad5(:,2);
+% refD = etad5(:,3);
+% refphi = etad5(:,4);
+% refpsi = etad5(:,5);
+% 
+% close ALL HIDDEN
+% 
+% figure(1);
+% subplot(5,1,1)
+% plot(etanu(:,1),etanu(:,2),etanu(:,1),refN)
+% legend('State', 'Reference');
+% title('N')
+% 
+% subplot(5,1,2)
+% plot(etanu(:,1),etanu(:,3),etanu(:,1),refE)
+% legend('State', 'Reference');
+% title('E')
+% 
+% subplot(5,1,3)
+% plot(etanu(:,1),etanu(:,4),etanu(:,1),refD)
+% legend('State', 'Reference');
+% title('D')
+% 
+% subplot(5,1,4)
+% plot(etanu(:,1),etanu(:,5),etanu(:,1),refphi)
+% legend('State', 'Reference');
+% title('phi (degrees)')
+% 
 % subplot(5,1,5)
-% plot(IMUg(3))
-% legend('IMU data')
+% plot(etanu(:,1),etanu(:,6),etanu(:,1),refpsi)
+% legend('State', 'Reference');
+% title('psi (degrees)')
+% 
+% figure(2);
+% subplot(5,1,1)
+% plot(etanu(:,1),etanu(:,7))
+% title('u')
+% 
+% subplot(5,1,2)
+% plot(etanu(:,1),etanu(:,8))
+% title('v')
+% 
+% subplot(5,1,3)
+% plot(etanu(:,1),etanu(:,9))
+% title('w')
+% 
+% subplot(5,1,4)
+% plot(etanu(:,1),etanu(:,10),etanu(:,1))
+% legend('true state','IMU data')
+% title('p (degrees/s)')
+% 
+% subplot(5,1,5)
+% plot(etanu(:,1),etanu(:,11),etanu(:,1))
+% legend('true state','IMU data')
+% title('r (degrees/s)')
+% 
+% % subplot(5,1,5)
+% % plot(IMUg(3))
+% % legend('IMU data')
 
 
 
