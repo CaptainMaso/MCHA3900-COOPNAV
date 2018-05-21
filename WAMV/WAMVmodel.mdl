@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.64"
+    ComputedModelVersion    "1.65"
     NumModelReferences	    0
     NumTestPointedSignals   0
     NumProvidedFunctions    0
@@ -56,7 +56,7 @@ Model {
       $ObjectID		      2
       $ClassName	      "Simulink.WindowInfo"
       IsActive		      [1]
-      Location		      [3113.0, 0.0, 975.0, 1167.0]
+      Location		      [8.0, 8.0, 975.0, 1167.0]
       Object {
 	$PropName		"ModelBrowserInfo"
 	$ObjectID		3
@@ -80,9 +80,9 @@ Model {
 	IsActive		[1]
 	ViewObjType		"SimulinkTopLevel"
 	LoadSaveID		"0"
-	Extents			[1384.0, 1503.0]
-	ZoomFactor		[1.5]
-	Offset			[278.05006397292425, -179.45389823281351]
+	Extents			[921.0, 986.0]
+	ZoomFactor		[1.25]
+	Offset			[342.41673063959104, -78.5372315661474]
       }
       Object {
 	$PropName		"DockComponentsInfo"
@@ -95,18 +95,18 @@ Model {
 	UserData		""
 	Floating		[0]
 	DockPosition		"Right"
-	Width			[426]
-	Height			[320]
+	Width			[640]
+	Height			[480]
       }
       WindowState	      "AAAA/wAAAAD9AAAAAgAAAAAAAAC9AAAB+PwCAAAAA/sAAAAWAEQAbwBjAGsAVwBpAGQAZwBlAHQAMwEAAAAxAAAB+AAAA"
       "AAAAAAA+wAAABYARABvAGMAawBXAGkAZABnAGUAdAA0AAAAAAD/////AAAAAAAAAAD7AAAAUgBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0Ac"
-      "ABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQAAAAAAP////8AAACSAP///wAAAAEAAAAAAAAAAPwCA"
+      "ABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQAAAAAAP////8AAABjAP///wAAAAEAAAAAAAAAAPwCA"
       "AAAAfsAAABUAEcATABVAEUAMgA6AFAAcgBvAHAAZQByAHQAeQBJAG4AcwBwAGUAYwB0AG8AcgAvAFAAcgBvAHAAZQByAHQAeQAgAEkAbgBzAHAAZ"
-      "QBjAHQAbwByAAAAAAD/////AAAAPQD///8AAAWgAAAGLQAAAAEAAAACAAAAAQAAAAL8AAAAAQAAAAIAAAAP/////wAAAAAA/////wAAAAAAAAAA/"
+      "QBjAHQAbwByAAAAAAD/////AAAAKwD///8AAAO/AAAEEwAAAAEAAAACAAAAAQAAAAL8AAAAAQAAAAIAAAAP/////wAAAAAA/////wAAAAAAAAAA/"
       "////wEAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/"
-      "////wEAAACp/////wAAAAAAAAAA/////wEAAAEu/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAHX/////wAAAAAAAAAA/"
-      "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAR7/////wAAAAAAAAAA/"
-      "////wEAAAS8/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA"
+      "////wEAAAB5/////wAAAAAAAAAA/////wEAAADa/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAFT/////wAAAAAAAAAA/"
+      "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAMr/////wAAAAAAAAAA/"
+      "////wEAAANa/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA"
     }
   }
   HideAutomaticNames	  on
@@ -114,11 +114,11 @@ Model {
   Creator		  "tristan"
   UpdateHistory		  "UpdateHistoryNever"
   ModifiedByFormat	  "%<Auto>"
-  LastModifiedBy	  "masom"
+  LastModifiedBy	  "Sam"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Mon May 21 14:47:14 2018"
-  RTWModifiedTimeStamp	  448814833
-  ModelVersionFormat	  "1.%<AutoIncrement:64>"
+  LastModifiedDate	  "Mon May 21 22:51:12 2018"
+  RTWModifiedTimeStamp	  448843871
+  ModelVersionFormat	  "1.%<AutoIncrement:65>"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
   LibraryLinkDisplay	  "none"
@@ -1799,7 +1799,7 @@ Model {
   }
   System {
     Name		    "WAMVmodel"
-    Location		    [3113, 0, 4088, 1167]
+    Location		    [8, 8, 983, 1175]
     Open		    on
     PortBlocksUseCompactNotation off
     SetDomainSpec	    off
@@ -1814,9 +1814,9 @@ Model {
     TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
     TiledPageScale	    1
     ShowPageBoundaries	    off
-    ZoomFactor		    "150"
+    ZoomFactor		    "125"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "71"
+    SIDHighWatermark	    "73"
     Block {
       BlockType		      Demux
       Name		      "Demux"
@@ -2133,7 +2133,7 @@ Model {
       Name		      "Scope1"
       SID		      "5"
       Ports		      [3]
-      Position		      [955, 492, 985, 558]
+      Position		      [885, 492, 915, 558]
       ZOrder		      -16
       ScopeSpecificationString "Simulink.scopes.TimeScopeBlockCfg('CurrentConfiguration', extmgr.ConfigurationSet(extm"
       "gr.Configuration('Core','General UI',true,'FigureColor',[0.156862745098039 0.156862745098039 0.156862745098039])"
@@ -2323,11 +2323,33 @@ Model {
       SampleTime	      "-1"
     }
     Block {
+      BlockType		      ToWorkspace
+      Name		      "To Workspace1"
+      SID		      "72"
+      Ports		      [1]
+      Position		      [545, 565, 605, 595]
+      ZOrder		      31
+      VariableName	      "WAMV_U"
+      MaxDataPoints	      "inf"
+      SaveFormat	      "Timeseries"
+      Save2DSignal	      "3-D array (concatenate along third dimension)"
+      FixptAsFi		      on
+      SampleTime	      "-1"
+    }
+    Block {
       BlockType		      ZeroOrderHold
       Name		      "Zero-Order\nHold"
       SID		      "70"
       Position		      [650, 125, 685, 155]
       ZOrder		      29
+      SampleTime	      "1/param.sensor_sample_rate"
+    }
+    Block {
+      BlockType		      ZeroOrderHold
+      Name		      "Zero-Order\nHold1"
+      SID		      "73"
+      Position		      [490, 565, 525, 595]
+      ZOrder		      32
       SampleTime	      "1/param.sensor_sample_rate"
     }
     Block {
@@ -2349,7 +2371,7 @@ Model {
       Name		      "controlAllocation"
       SID		      "39"
       Ports		      [1, 1]
-      Position		      [240, 442, 320, 478]
+      Position		      [230, 442, 310, 478]
       ZOrder		      14
       BlockMirror	      on
       MATLABFcn		      "wamv_controlAllocation"
@@ -2475,9 +2497,18 @@ Model {
       }
       Branch {
 	ZOrder			53
-	Points			[0, 65]
-	DstBlock		"Demux1"
-	DstPort			1
+	Points			[0, 65; 96, 0]
+	Branch {
+	  ZOrder		  194
+	  Points		  [0, 55]
+	  DstBlock		  "Zero-Order\nHold1"
+	  DstPort		  1
+	}
+	Branch {
+	  ZOrder		  193
+	  DstBlock		  "Demux1"
+	  DstPort		  1
+	}
       }
     }
     Line {
@@ -2512,7 +2543,6 @@ Model {
       Points		      [5, 0]
       Branch {
 	ZOrder			149
-	Points			[0, -130]
 	DstBlock		"detanu to dnu"
 	DstPort			1
       }
@@ -2632,7 +2662,7 @@ Model {
       Labels		      [2, 0]
       SrcBlock		      "controlAllocation"
       SrcPort		      1
-      Points		      [-80, 0]
+      Points		      [-70, 0]
       DstBlock		      "actuatorModel"
       DstPort		      1
     }
@@ -2844,6 +2874,13 @@ Model {
       DstBlock		      "Mux2"
       DstPort		      2
     }
+    Line {
+      ZOrder		      191
+      SrcBlock		      "Zero-Order\nHold1"
+      SrcPort		      1
+      DstBlock		      "To Workspace1"
+      DstPort		      1
+    }
     Annotation {
       SID		      "42"
       Name		      "Control system"
@@ -2857,7 +2894,7 @@ Model {
       BackgroundColor	      "[0.956863, 0.980392, 0.921569]"
       DropShadow	      on
       AnnotationType	      "area_annotation"
-      ZOrder		      168
+      ZOrder		      174
       FontSize		      12
     }
     Annotation {
@@ -2873,7 +2910,7 @@ Model {
       BackgroundColor	      "[0.996078, 0.968627, 0.905882]"
       DropShadow	      on
       AnnotationType	      "area_annotation"
-      ZOrder		      167
+      ZOrder		      173
       FontSize		      12
     }
   }

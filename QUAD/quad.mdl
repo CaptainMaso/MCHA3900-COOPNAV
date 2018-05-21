@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.96"
+    ComputedModelVersion    "1.99"
     NumModelReferences	    0
     NumTestPointedSignals   0
     NumProvidedFunctions    0
@@ -104,9 +104,9 @@ Model {
 	IsActive		[1]
 	ViewObjType		"SimulinkTopLevel"
 	LoadSaveID		"0"
-	Extents			[1863.0, 1218.0]
-	ZoomFactor		[1.5]
-	Offset			[116.12576319000777, -110.44444444444441]
+	Extents			[1240.0, 796.0]
+	ZoomFactor		[0.8]
+	Offset			[-398.62692254615695, -138.93005674767051]
       }
       Object {
 	$PropName		"DockComponentsInfo"
@@ -119,18 +119,18 @@ Model {
 	UserData		""
 	Floating		[0]
 	DockPosition		"Right"
-	Width			[426]
-	Height			[320]
+	Width			[640]
+	Height			[480]
       }
       WindowState	      "AAAA/wAAAAD9AAAAAgAAAAAAAAC9AAAB+PwCAAAAA/sAAAAWAEQAbwBjAGsAVwBpAGQAZwBlAHQAMwEAAAAxAAAB+AAAA"
       "AAAAAAA+wAAABYARABvAGMAawBXAGkAZABnAGUAdAA0AAAAAAD/////AAAAAAAAAAD7AAAAUgBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0Ac"
-      "ABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQAAAAAAP////8AAACSAP///wAAAAEAAAAAAAAAAPwCA"
+      "ABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQAAAAAAP////8AAABjAP///wAAAAEAAAAAAAAAAPwCA"
       "AAAAfsAAABUAEcATABVAEUAMgA6AFAAcgBvAHAAZQByAHQAeQBJAG4AcwBwAGUAYwB0AG8AcgAvAFAAcgBvAHAAZQByAHQAeQAgAEkAbgBzAHAAZ"
-      "QBjAHQAbwByAAAAAAD/////AAAAPQD///8AAAd/AAAFEAAAAAEAAAACAAAAAQAAAAL8AAAAAQAAAAIAAAAP/////wAAAAAA/////wAAAAAAAAAA/"
+      "QBjAHQAbwByAAAAAAD/////AAAAKwD///8AAAT+AAADVQAAAAEAAAACAAAAAQAAAAL8AAAAAQAAAAIAAAAP/////wAAAAAA/////wAAAAAAAAAA/"
       "////wEAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/"
-      "////wEAAACp/////wAAAAAAAAAA/////wEAAAEu/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAHX/////wAAAAAAAAAA/"
-      "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAR7/////wAAAAAAAAAA/"
-      "////wEAAAS8/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA"
+      "////wEAAAB5/////wAAAAAAAAAA/////wEAAADa/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAFT/////wAAAAAAAAAA/"
+      "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAMr/////wAAAAAAAAAA/"
+      "////wEAAANa/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA"
     }
   }
   HideAutomaticNames	  on
@@ -138,11 +138,11 @@ Model {
   Creator		  "tristan"
   UpdateHistory		  "UpdateHistoryNever"
   ModifiedByFormat	  "%<Auto>"
-  LastModifiedBy	  "masom"
+  LastModifiedBy	  "Sam"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Mon May 21 12:58:52 2018"
-  RTWModifiedTimeStamp	  448808330
-  ModelVersionFormat	  "1.%<AutoIncrement:96>"
+  LastModifiedDate	  "Mon May 21 22:50:37 2018"
+  RTWModifiedTimeStamp	  448843830
+  ModelVersionFormat	  "1.%<AutoIncrement:99>"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
   LibraryLinkDisplay	  "none"
@@ -1832,9 +1832,9 @@ Model {
     TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
     TiledPageScale	    1
     ShowPageBoundaries	    off
-    ZoomFactor		    "150"
+    ZoomFactor		    "80"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "95"
+    SIDHighWatermark	    "97"
     Block {
       BlockType		      Scope
       Name		      "Actuator Forces"
@@ -2428,7 +2428,7 @@ Model {
       Name		      "Quad Rotors"
       SID		      "57"
       Ports		      [4]
-      Position		      [355, 569, 385, 641]
+      Position		      [280, 569, 310, 641]
       ZOrder		      28
       ScopeSpecificationString "Simulink.scopes.TimeScopeBlockCfg('CurrentConfiguration', extmgr.ConfigurationSet(extm"
       "gr.Configuration('Core','General UI',true),extmgr.Configuration('Core','Source UI',true),extmgr.Configuration('S"
@@ -2565,11 +2565,33 @@ Model {
       SampleTime	      "-1"
     }
     Block {
+      BlockType		      ToWorkspace
+      Name		      "To Workspace1"
+      SID		      "96"
+      Ports		      [1]
+      Position		      [520, 560, 580, 590]
+      ZOrder		      300
+      VariableName	      "QUAD_U"
+      MaxDataPoints	      "inf"
+      SaveFormat	      "Timeseries"
+      Save2DSignal	      "3-D array (concatenate along third dimension)"
+      FixptAsFi		      on
+      SampleTime	      "-1"
+    }
+    Block {
       BlockType		      ZeroOrderHold
       Name		      "Zero-Order\nHold"
       SID		      "94"
       Position		      [645, 190, 680, 220]
       ZOrder		      298
+      SampleTime	      "1/param.sensor_sample_rate"
+    }
+    Block {
+      BlockType		      ZeroOrderHold
+      Name		      "Zero-Order\nHold1"
+      SID		      "97"
+      Position		      [435, 560, 470, 590]
+      ZOrder		      301
       SampleTime	      "1/param.sensor_sample_rate"
     }
     Block {
@@ -2628,8 +2650,17 @@ Model {
       Branch {
 	ZOrder			53
 	Points			[0, 65]
-	DstBlock		"Demux1"
-	DstPort			1
+	Branch {
+	  ZOrder		  607
+	  DstBlock		  "Demux1"
+	  DstPort		  1
+	}
+	Branch {
+	  ZOrder		  606
+	  Points		  [0, 50]
+	  DstBlock		  "Zero-Order\nHold1"
+	  DstPort		  1
+	}
       }
     }
     Line {
@@ -2701,7 +2732,7 @@ Model {
 	Points			[0, 45]
 	Branch {
 	  ZOrder		  307
-	  Points		  [159, 0; 0, 145]
+	  Points		  [179, 0; 0, 145]
 	  DstBlock		  "Mux2"
 	  DstPort		  2
 	}
@@ -3193,6 +3224,13 @@ Model {
       DstBlock		      "Mux7"
       DstPort		      2
     }
+    Line {
+      ZOrder		      604
+      SrcBlock		      "Zero-Order\nHold1"
+      SrcPort		      1
+      DstBlock		      "To Workspace1"
+      DstPort		      1
+    }
     Annotation {
       SID		      "42"
       Name		      "Control system"
@@ -3206,7 +3244,7 @@ Model {
       BackgroundColor	      "[0.956863, 0.980392, 0.921569]"
       DropShadow	      on
       AnnotationType	      "area_annotation"
-      ZOrder		      312
+      ZOrder		      322
       FontSize		      12
     }
     Annotation {
@@ -3222,7 +3260,7 @@ Model {
       BackgroundColor	      "[0.996078, 0.968627, 0.905882]"
       DropShadow	      on
       AnnotationType	      "area_annotation"
-      ZOrder		      311
+      ZOrder		      321
       FontSize		      12
     }
   }

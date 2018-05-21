@@ -8,7 +8,10 @@ param.AUV.dofIdx = [1 2 3 4 6]; % N, E, D, psi(yaw)
 param.AUV.m = 10.17; 
 
 % Inertia
-param.AUV.IBb   = diag([0.139 0.171 0.212]);
+param.AUV.IBbx  = 0.139;
+param.AUV.IBby  = 0.171;
+param.AUV.IBbz  = 0.212;
+param.AUV.IBb   = diag([param.AUV.IBbx param.AUV.IBby param.AUV.IBbz]);
 
 % param.AUV.IBb   = [0.98657 0.06241 0.15094;
 %                -0.06085 0.99804 -0.01492;

@@ -12,6 +12,4 @@ if (eta(1) > 500); eta(1)=500; elseif (eta(1) < -500); eta(1)=-500; end
 if (eta(2) > 500); eta(2)=500; elseif (eta(2) < -500); eta(2)=-500; end
 if (eta(1) > 100); eta(3)=100; elseif (eta(3) < -100); eta(3)=-100; end
 
-GPSnoise = param.GPS.sigma*randn(3,1);
-
-y_gps = [eta(1);eta(2);eta(3)] + GPSnoise;
+y_gps = [eta(1);eta(2);eta(3)];
