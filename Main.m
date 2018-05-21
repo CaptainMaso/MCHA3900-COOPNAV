@@ -15,7 +15,8 @@ global param map data
 param.g = 9.81;
 
 % --- Sensor Parameters
-param.sensor_sample_rate = 1;  % Sample rate (Hz)
+param.sensor_sample_rate = 100;  % Sample rate (Hz)
+param.IMU.samplerate = 100;
 
 % ---- LPS parameters
 param.LPS.sigma = 0.1;          % Noise on LPS data (m)
