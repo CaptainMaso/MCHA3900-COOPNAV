@@ -37,8 +37,7 @@ CA = [[      0,            0,                         0,                    0,  
     [        0,     -pauv.Zwdot*w,              pauv.Yvdot*v,               0,                       0];
     [ -pauv.Yvdot*v,  pauv.Xudot*u,                  0,                     0                        0] ];
 
-Dm = diag([-pauv.Xu-pauv.Xauu*abs(nu5r(1)),-pauv.Yv-pauv.Yavv*abs(nu5r(2)),-pauv.Zw-pauv.Zaww*abs(nu5r(3)),-pauv.Kp-pauv.Kapp*abs(nu5r(4)),-pauv.Nr-pauv.Narr*abs(nu5r(5))]);
-                
+Dm = diag([-pauv.Xu-pauv.Xauu*abs(nu5r(1)),-pauv.Yv-pauv.Yavv*abs(nu5r(2)),-pauv.Zw-pauv.Zaww*abs(nu5r(3)),-pauv.Kp-pauv.Kapp*abs(nu5r(4)),-pauv.Nr-pauv.Narr*abs(nu5r(5))]);                
 
 NB = [0;0;0.2*9.81;0;0];      % Net bouyancy
 deta5 = J5*nu5r;
