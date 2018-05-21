@@ -4,8 +4,6 @@ global param
 % Indices for degrees of freedom of interest
 param.WAMV.dofIdx = [1 2 6]; % N, E, psi(yaw)
 
-param.g = 9.81;
-
 % Mass [kg]
 param.WAMV.m = 200; 
 

@@ -1,6 +1,7 @@
-function dx = detanu(in)
+function dx = auv_detanu(in)
 
 global param
+pauv = param.AUV;
 
 tau3 = in(1:5);  % X, Y, Z, N
 eta3 = in(6:10);  % N, E, D, psi
@@ -12,34 +13,34 @@ nu3r = nu3 + [vc;0;0];
 eta3 = eta3 + etabar;
 % Pad eta with zeros
 eta = zeros(6,1);
-eta(param.dofIdx) = eta3;            % N, E, D, phi, theta, psi
+eta(pauv.dofIdx) = eta3;            % N, E, D, phi, theta, psi
 
 % Obtain kinematic transformation for DOF of interest
 J = eulerKinematicTransformation(eta);
-J3 = J(param.dofIdx,param.dofIdx);
+J3 = J(pauv.dofIdx,pauv.dofIdx);
 
 omegaBNb = [0; in(14); in(15)];
 SomegaBNb = skew(omegaBNb);
-CRB = [param.m*SomegaBNb   -param.m*SomegaBNb*param.SrCBb;
-       param.m*param.SrCBb*SomegaBNb    -skew(param.IBb*omegaBNb)];
-CRB3 = CRB(param.dofIdx,param.dofIdx);
+CRB = [pauv.m*SomegaBNb   -pauv.m*SomegaBNb*pauv.SrCBb;
+       pauv.m*pauv.SrCBb*SomegaBNb    -skew(pauv.IBb*omegaBNb)];
+CRB3 = CRB(pauv.dofIdx,pauv.dofIdx);
 
-MA = diag([param.Xudot param.Yvdot param.Yvdot 0.3864 0.3864]);
+MA = diag([pauv.Xudot pauv.Yvdot pauv.Yvdot 0.3864 0.3864]);
 
 
-CA = [0                                             0        0      0       param.Yvdot*nu3r(2)+param.Yrdot*nu3r(3);
-      0                                             0        0      0       -param.Xudot*nu3r(1);
-      0                                             0        0      0       -param.Xudot*nu3r(1);
-      0                                             0        0      0         param.Xudot*nu3r(1) + param.Xudot*nu3r(1)
-      -param.Yvdot*nu3r(2)-param.Yrdot*nu3r(3)     param.Xudot*nu3r(1)          param.Xudot*nu3r(1) -param.Xudot*nu3r(1) - param.Xudot*nu3r(1)   0];
+CA = [0                                             0        0      0       pauv.Yvdot*nu3r(2)+pauv.Yrdot*nu3r(3);
+      0                                             0        0      0       -pauv.Xudot*nu3r(1);
+      0                                             0        0      0       -pauv.Xudot*nu3r(1);
+      0                                             0        0      0         pauv.Xudot*nu3r(1) + pauv.Xudot*nu3r(1)
+      -pauv.Yvdot*nu3r(2)-pauv.Yrdot*nu3r(3)     pauv.Xudot*nu3r(1)          pauv.Xudot*nu3r(1) -pauv.Xudot*nu3r(1) - pauv.Xudot*nu3r(1)   0];
   
-Dm = diag([-param.Xu-param.Xauu*abs(nu3r(1)),-param.Yv-param.Yavv*abs(nu3r(2)),-param.Yv-param.Yavv*abs(nu3r(2)),-param.Nr-param.Narr*abs(nu3r(3)),-param.Nr-param.Narr*abs(nu3r(3))]);
+Dm = diag([-pauv.Xu-pauv.Xauu*abs(nu3r(1)),-pauv.Yv-pauv.Yavv*abs(nu3r(2)),-pauv.Yv-pauv.Yavv*abs(nu3r(2)),-pauv.Nr-pauv.Narr*abs(nu3r(3)),-pauv.Nr-pauv.Narr*abs(nu3r(3))]);
                 
 
 NB = [0;0;0.2*9.81;0;0];      % Net bouyancy
 deta3 = J3*nu3;
-% dnu3 = inv(param.MRB3+MA)*(tau3 - (CRB3*nu3 + CA*nu3r) - Dm*nu3r + NB);
-dnu3 = inv(param.MRB5+MA)*(tau3 - CRB3*nu3 - Dm*nu3r + NB);
+% dnu3 = inv(pauv.MRB3+MA)*(tau3 - (CRB3*nu3 + CA*nu3r) - Dm*nu3r + NB);
+dnu3 = inv(pauv.MRB5+MA)*(tau3 - CRB3*nu3 - Dm*nu3r + NB);
 
 
 dx = [deta3;dnu3];
