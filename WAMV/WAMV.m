@@ -52,7 +52,7 @@ Sysr = ss(param.Ar, param.Br, param.Cr, param.Dr);
 
 % Initial and final conditions
 etai = [0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0];
-etad = [100; 0; 0; 0; 0; 0];
+etad = [50; 0; 0; 0; 0; 0];
 etad3 = etad(param.dofIdx); % Get desired eta for the 3 dof of choice
 
 %%

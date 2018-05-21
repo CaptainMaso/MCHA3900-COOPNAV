@@ -11,7 +11,41 @@ SomegaBNb = skew(omegaBNb);
 
 CRB = [param.m*SomegaBNb, -param.m*SomegaBNb*param.SrCBb;
        param.m*param.SrCBb*SomegaBNb, -skew(param.IBb*omegaBNb)];
-deta = J*nu;
-dnu = param.MRB\(tau - CRB*nu);
+   
+Xdu = -126.9;
+Xu  = -100.0;
+Xuu = -269.5;
+Ydv = -235.4;
+Ydr = - 31.1;
+Yv  = -526.0;
+Yvv = -209.8;
+Ndr = - 95.3;
+Nr  = - 88.8;
+Nrr = - 22.1;
 
+Kpp = -180;   Kv  = -300;
+Mqq = -180;   Mv  = -200;   
+   
+u = nu(1); v = nu(2); w = nu(3); p = nu(4); q = nu(5); r = nu(6);
+CA = [                   0         0 0 0 0         Ydv*v+Ydr*r;
+                         0         0 0 0 0              -Xdu*u;
+                         0         0 0 0 0                   0;
+                         0         0 0 0 0                   0;
+                         0         0 0 0 0                   0;
+              -Ydv*v-Ydr*r     Xdu*u 0 0 0                   0];
+Dv = -diag([Xuu*abs(u), Yvv*abs(v), 0, Kpp*abs(p), Mqq*abs(q), Nrr*abs(r)]);
+Dlin = -diag([Xu,Yv,0,Kv,Mv,Nr]);
+D  = Dlin + Dv;  
+  
+MA = [       -Xdu        0  0 0 0            0;
+                 0        -Ydv  0 0 0         -Ydr;
+                 0           0  0 0 0            0;
+                 0           0  0 0 0            0;
+                 0           0  0 0 0            0;
+                 0        -Ydr  0 0 0        -Ndr];
+
+M = param.MRB + MA;
+deta = J*nu;
+dnu = (param.MRB)\(tau - CRB*nu);
+%dnu  = (-M \(CRB+CA+D))*nu + M\tau;
 dx = [deta; dnu];
