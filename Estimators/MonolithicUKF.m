@@ -26,7 +26,7 @@ function [XmfHist, SmfHist] = MonolithicUKF(Xm0, Sm0, Ym, Um, processModelM, mea
 
 N = size(Ym,2);     % Length of data
 n = size(Xm0,1);    % Size of state vector
-m = size(Um,1);     % Size of input vector
+m = size(Um,1);     % Size of input vector (Required to be n-n_biases)
 p = size(Ym,1);     % Size of output vector
 
 % Initialise space for estimated means and covariances

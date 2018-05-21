@@ -5,6 +5,7 @@ addpath('WAMV');
 addpath('AUV');
 addpath('Sensors');
 addpath('Common');
+addpath('Estimators');
 
 warning('off', 'MATLAB:legend:IgnoringExtraEntries');
 
