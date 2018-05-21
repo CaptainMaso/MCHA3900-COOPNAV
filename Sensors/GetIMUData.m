@@ -1,4 +1,4 @@
-function y_imu = GetIMUData(in)
+function [y_imu, JacC] = GetIMUData(in)
 global param
 %in(1:6) -> eta
 %in(7:12) -> nu
