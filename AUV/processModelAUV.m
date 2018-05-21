@@ -7,12 +7,12 @@ J = eulerKinematicTransformation(eta6);
 u = nu6(1); v = nu6(2); w = nu6(3); p = nu6(4); q = nu6(5); r = nu6(6);
 
 CRB = [
-[                 0,                         -pauv.pauv.m*r,               pauv.pauv.m*q, pauv.pauv.m*q*pauv.pauv.yg + pauv.pauv.m*r*pauv.pauv.zg,         -pauv.pauv.m*q*pauv.pauv.xg,         -pauv.pauv.m*r*pauv.pauv.xg];
-[               pauv.pauv.m*r,                       0,              -pauv.pauv.m*p,         -pauv.pauv.m*p*pauv.pauv.yg, pauv.pauv.m*p*pauv.pauv.xg + pauv.pauv.m*r*pauv.pauv.zg,         -pauv.pauv.m*r*pauv.pauv.yg];
-[              -pauv.pauv.m*q,                      pauv.pauv.m*p,                 0,         -pauv.pauv.m*p*pauv.pauv.zg,         -pauv.pauv.m*q*pauv.pauv.zg, pauv.pauv.m*p*pauv.pauv.xg + pauv.pauv.m*q*pauv.pauv.yg];
-[ - pauv.pauv.m*q*pauv.pauv.yg - pauv.pauv.m*r*pauv.pauv.zg,        pauv.pauv.m*p*pauv.pauv.yg,            pauv.pauv.m*p*pauv.pauv.zg,               0,          pauv.IBbz*r,         -pauv.IBby*q];
-[            pauv.pauv.m*q*pauv.pauv.xg,          - pauv.pauv.m*p*pauv.pauv.xg - pauv.pauv.m*r*pauv.pauv.zg,            pauv.pauv.m*q*pauv.pauv.zg,         -pauv.IBbz*r,               0,          pauv.IBbx*p];
-[            pauv.pauv.m*r*pauv.pauv.xg,            pauv.pauv.m*r*pauv.pauv.yg, - pauv.pauv.m*p*pauv.pauv.xg - pauv.pauv.m*q*pauv.pauv.yg,          pauv.IBby*q,         -pauv.IBbx*p,               0];
+[                 0,                         -pauv.m*r,               pauv.m*q, pauv.m*q*pauv.yg + pauv.m*r*pauv.zg,         -pauv.m*q*pauv.xg,         -pauv.m*r*pauv.xg];
+[               pauv.m*r,                       0,              -pauv.m*p,         -pauv.m*p*pauv.yg, pauv.m*p*pauv.xg + pauv.m*r*pauv.zg,         -pauv.m*r*pauv.yg];
+[              -pauv.m*q,                      pauv.m*p,                 0,         -pauv.m*p*pauv.zg,         -pauv.m*q*pauv.zg, pauv.m*p*pauv.xg + pauv.m*q*pauv.yg];
+[ - pauv.m*q*pauv.yg - pauv.m*r*pauv.zg,        pauv.m*p*pauv.yg,            pauv.m*p*pauv.zg,               0,          pauv.IBbz*r,         -pauv.IBby*q];
+[            pauv.m*q*pauv.xg,          - pauv.m*p*pauv.xg - pauv.m*r*pauv.zg,            pauv.m*q*pauv.zg,         -pauv.IBbz*r,               0,          pauv.IBbx*p];
+[            pauv.m*r*pauv.xg,            pauv.m*r*pauv.yg, - pauv.m*p*pauv.xg - pauv.m*q*pauv.yg,          pauv.IBby*q,         -pauv.IBbx*p,               0];
  ];
  
 MA = diag([pauv.Xudot, pauv.Yvdot, pauv.Zwdot, pauv.Kpdot, pauv.Mqdot, pauv.Nrdot]);
