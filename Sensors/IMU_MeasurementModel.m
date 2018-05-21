@@ -12,7 +12,3 @@ dnu = detanu(7:12);
 
 y_acc = [eye(3), -skew(rMBb)]*dnu + skew(wBNb)*vBNb - Rnb'*gn;
 y_gyro = blkdiag(zeros(9), eye(3))*X;
-
-
-% Shit discretisation but whatever
-
