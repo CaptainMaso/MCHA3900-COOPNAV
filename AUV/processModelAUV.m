@@ -3,7 +3,7 @@ function [xnext,A,SQ] = processModelAUV(x,u,pauv)
 
 eta6 = x(1:6);  % N, E, D, roll, psi
 nu6  = x(7:12);  % u, v, w, p, r
-J = eulerKinematicTransformation(eta5);
+J = eulerKinematicTransformation(eta6);
 u = nu6(1); v = nu6(2); w = nu6(3); p = nu6(4); q = nu6(5); r = nu6(6);
 
 CRB = [
