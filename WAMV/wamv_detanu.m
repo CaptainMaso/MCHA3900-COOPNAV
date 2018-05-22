@@ -6,46 +6,38 @@ eta = in(7:12);  % N, E, D, phi, theta, psi
 nu  = in(13:18);  % u, v, w, p, q, r
 
 J = eulerKinematicTransformation(eta);
-omegaBNb = [nu(4);nu(5);nu(6)];
+omegaBNb = [0;0;nu(6)];
 SomegaBNb = skew(omegaBNb);
 
-CRB = [param.WAMV.m*SomegaBNb, -param.WAMV.m*SomegaBNb*param.WAMV.SrCBb;
-       param.WAMV.m*param.WAMV.SrCBb*SomegaBNb, -skew(param.WAMV.IBb*omegaBNb)];
+u = nu(1); v = nu(2); w = nu(3); p = nu(4); q = nu(5); r = nu(6); 
+CRB = [                 param.WAMV.m*SomegaBNb, -param.WAMV.m*SomegaBNb*param.WAMV.SrCBb;
+       param.WAMV.m*param.WAMV.SrCBb*SomegaBNb,          -skew(param.WAMV.IBb*omegaBNb)];
    
-Xdu = -126.9;
-Xu  = -100.0;
-Xuu = -269.5;
-Ydv = -235.4;
-Ydr = - 31.1;
-Yv  = -526.0;
-Yvv = -209.8;
-Ndr = - 95.3;
-Nr  = - 88.8;
-Nrr = - 22.1;
-
-Kpp = -180;   Kv  = -300;
-Mqq = -180;   Mv  = -200;   
-   
-u = nu(1); v = nu(2); w = nu(3); p = nu(4); q = nu(5); r = nu(6);
-CA = [                   0         0 0 0 0         Ydv*v+Ydr*r;
-                         0         0 0 0 0              -Xdu*u;
-                         0         0 0 0 0                   0;
-                         0         0 0 0 0                   0;
-                         0         0 0 0 0                   0;
-              -Ydv*v-Ydr*r     Xdu*u 0 0 0                   0];
-Dv = -diag([Xuu*abs(u), Yvv*abs(v), 0, Kpp*abs(p), Mqq*abs(q), Nrr*abs(r)]);
-Dlin = -diag([Xu,Yv,0,Kv,Mv,Nr]);
-D  = Dlin + Dv;  
+% CA = [           0,                  0,                 0,                 0, -param.WAMV.Zdw*w,   param.WAMV.Ydv*v;
+%                  0,                  0,                 0,  param.WAMV.Zdw*w,                 0,  -param.WAMV.Xdu*u;
+%                  0,                  0,                 0, -param.WAMV.Ydv*v,  param.WAMV.Xdu*u,                  0;
+%                  0,  -param.WAMV.Zdw*w,  param.WAMV.Ydv*v,                 0, -param.WAMV.Ndr*r,   param.WAMV.Mdq*q;
+%   param.WAMV.Zdw*w,                  0, -param.WAMV.Xdu*u,  param.WAMV.Ndr*r,                 0,  -param.WAMV.Kdp*p;
+%  -param.WAMV.Ydv*v,   param.WAMV.Xdu*u,                 0, -param.WAMV.Mdq*q,  param.WAMV.Kdp*p,                  0];
+%  
+%Dnon = -diag([param.WAMV.Xuu*abs(u),param.WAMV.Yvv*abs(v),param.WAMV.Zww*abs(w)*0,param.WAMV.Kpp*abs(p),param.WAMV.Mqq*abs(q),param.WAMV.Nrr*abs(r)]);  
+%D = param.WAMV.Dlin + Dnon;
   
-MA = [       -Xdu        0  0 0 0            0;
-                 0        -Ydv  0 0 0         -Ydr;
-                 0           0  0 0 0            0;
-                 0           0  0 0 0            0;
-                 0           0  0 0 0            0;
-                 0        -Ydr  0 0 0        -Ndr];
+NB = [0;0;4171.212;0;0;0];
 
-M = param.WAMV.MRB + MA;
+MA = diag([-param.WAMV.Xdu, -param.WAMV.Ydv, 0, 0, 0 -param.WAMV.Ndr]);
+MA(6,2) = -param.WAMV.Ydr;
+MA(2,6) = -param.WAMV.Ydr;
+
+CA = zeros(6,6);
+CA(1,6) = param.WAMV.Ydv*v + param.WAMV.Ydr*v;
+CA(2,6) = -param.WAMV.Xdu*u;
+CA(6,1) = -param.WAMV.Ydv*v-param.WAMV.Ydr*r;
+CA(6,2) = param.WAMV.Xdu*u;
+
+D = diag([-param.WAMV.Xu-param.WAMV.Xuu*abs(u),-param.WAMV.Yv-param.WAMV.Yvv*abs(v),0,0,0,-param.WAMV.Nr-param.WAMV.Nrr*abs(r)]);
+  
 deta = J*nu;
-dnu = (param.WAMV.MRB)\(tau - CRB*nu);
-%dnu  = (-M \(CRB+CA+D))*nu + M\tau;
+dnu = inv(param.WAMV.MRB+MA)*(tau -(CRB+CA)*nu - D*nu);
+%dnu = inv(param.WAMV.MRB)*(tau - CRB*nu);
 dx = [deta; dnu];
