@@ -5,6 +5,7 @@ addpath('WAMV');
 addpath('AUV');
 addpath('Sensors');
 addpath('Common');
+addpath('Estimators');
 
 warning('off', 'MATLAB:legend:IgnoringExtraEntries');
 
@@ -15,13 +16,20 @@ global param map data
 param.g = 9.81;
 
 % --- Sensor Parameters
-param.sensor_sample_rate = 1;  % Sample rate (Hz)
+param.sensor_sample_rate = 100;  % Sample rate (Hz)
+param.IMU.samplerate = 100;
 
 % ---- LPS parameters
 param.LPS.sigma = 0.1;          % Noise on LPS data (m)
-
 % ---- Visual Bearing (VB) parameters
-param.VB.sigma = diag([0.1, 0.1, 0.1]);          % Noise on VB data (rad)
+param.VB.sigma      = eye(3)*0.01;      % Noise on VB data (rad)
+% ---- IMU parameters
+param.IMU.acc_sigma = eye(3)*0.01;      % Noise on accelerometer data (m/s^2)
+param.IMU.gyro_sigma = eye(3)*0.01;     % Noise on gyro data (rad/s)
+param.IMU.gyro_bias  = diag([0.4, -0.2, 0.6]);
+param.IMU.magn_sigma = eye(3)*0.01;
+% ---- GPS parameters
+param.GPS.sigma      = eye(3)*5;       % Noise on gps data (m)
 
 % --- Simulation Parameters
 param.tf = 50;
@@ -29,30 +37,33 @@ param.tf = 50;
 %% Get Vehicle Data
 % -- QUAD data
 Quadrotor();
-data.QUAD.raw.t = QUAD_states.Time';
-data.QUAD.raw.N = length(data.QUAD.raw.t);
-data.QUAD.raw.X = QUAD_states.Data(:, 1:12)';
-data.QUAD.raw.dnu = QUAD_states.Data(:, 13:18)';
+data.QUAD.raw.t     = QUAD_states.Time';
+data.QUAD.raw.N     = length(data.QUAD.raw.t);
+data.QUAD.raw.X     = QUAD_states.Data(:, 1:12)';
+data.QUAD.raw.dnu   = QUAD_states.Data(:, 13:18)';
+data.QUAD.U         = QUAD_U.Data';
 
 clearvars -except data param map
 
-% -- WAMV data
+%% -- WAMV data
 WAMV();
 
-data.WAMV.raw.t = WAMV_states.Time';
-data.WAMV.raw.N = length(data.WAMV.raw.t);
-data.WAMV.raw.X = WAMV_states.Data(:, 1:12)';
-data.WAMV.raw.dnu = WAMV_states.Data(:, 13:18)';
+data.WAMV.raw.t     = WAMV_states.Time';
+data.WAMV.raw.N     = length(data.WAMV.raw.t);
+data.WAMV.raw.X     = WAMV_states.Data(:, 1:12)';
+data.WAMV.raw.dnu   = WAMV_states.Data(:, 13:18)';
+data.WAMV.U         = WAMV_U.Data';
 
 clearvars -except data param map
  
-% -- AUV data
+%% -- AUV data
 AUV();
 
-data.AUV.raw.t = AUV_states.Time';
-data.AUV.raw.N = length(data.AUV.raw.t);
-data.AUV.raw.X = AUV_states.Data(:, 1:12)';
-data.AUV.raw.dnu = AUV_states.Data(:, 13:18)';
+data.AUV.raw.t      = AUV_states.Time';
+data.AUV.raw.N      = length(data.AUV.raw.t);
+data.AUV.raw.X      = AUV_states.Data(:, 1:12)';
+data.AUV.raw.dnu    = AUV_states.Data(:, 13:18)';
+data.AUV.U         = AUV_U.Data';
 
 clearvars -except data param map
 
@@ -60,18 +71,12 @@ clearvars -except data param map
 % Get Map data
 Map();
 
+% Get all Data
+for t = 1:param.tf*param.sensor_sample_rate
+    data.RAW.All  = GetRawData([data.AUV.X(:,t); zeros(12,1); data.QUAD.X(:,t)], ...
+                         [data.AUV.dnu(:,t); zeros(6,1); data.QUAD.dnu(:,t)]);
+end
 % -- QUAD measurement simulation
-% --- LPS data
-data.QUAD.LPS = zeros(map.LPS.N, data.QUAD.raw.N);
-for ii = 1:data.QUAD.raw.N
-    data.QUAD.LPS(:,ii) = GetLPSData([data.QUAD.raw.X(:,ii); data.QUAD.raw.dnu(:,ii)]);
-end
-
-% --- VB data
-data.QUAD.VB = zeros(3, map.VB.N, data.QUAD.raw.N);
-for ii = 1:data.QUAD.raw.N
-    data.QUAD.VB(:,:,ii) = GetVBData([data.QUAD.raw.X(:,ii); data.QUAD.raw.dnu(:,ii)]);
-end
 
 % -- WAMV measurement simulation
 

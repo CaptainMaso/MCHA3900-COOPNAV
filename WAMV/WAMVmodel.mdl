@@ -6,7 +6,11 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
+<<<<<<< HEAD
     ComputedModelVersion    "1.66"
+=======
+    ComputedModelVersion    "1.65"
+>>>>>>> 930c2add515428aee4e4e695a045a1f24be74e46
     NumModelReferences	    0
     NumTestPointedSignals   0
     NumProvidedFunctions    0
@@ -56,7 +60,11 @@ Model {
       $ObjectID		      2
       $ClassName	      "Simulink.WindowInfo"
       IsActive		      [1]
+<<<<<<< HEAD
       Location		      [762.0, 0.0, 781.0, 830.0]
+=======
+      Location		      [8.0, 8.0, 975.0, 1167.0]
+>>>>>>> 930c2add515428aee4e4e695a045a1f24be74e46
       Object {
 	$PropName		"ModelBrowserInfo"
 	$ObjectID		3
@@ -80,9 +88,15 @@ Model {
 	IsActive		[1]
 	ViewObjType		"SimulinkTopLevel"
 	LoadSaveID		"0"
+<<<<<<< HEAD
 	Extents			[913.0, 823.0]
 	ZoomFactor		[0.8]
 	Offset			[107.43750789761543, 30.824140933871035]
+=======
+	Extents			[921.0, 986.0]
+	ZoomFactor		[1.25]
+	Offset			[342.41673063959104, -78.5372315661474]
+>>>>>>> 930c2add515428aee4e4e695a045a1f24be74e46
       }
       Object {
 	$PropName		"DockComponentsInfo"
@@ -95,6 +109,7 @@ Model {
 	UserData		""
 	Floating		[0]
 	DockPosition		"Right"
+<<<<<<< HEAD
 	Width			[512]
 	Height			[384]
       }
@@ -107,6 +122,20 @@ Model {
       "////wEAAACR/////wAAAAAAAAAA/////wEAAAEE/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAGV/////wAAAAAAAAAA/"
       "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAOG/////wAAAAAAAAAA/"
       "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA"
+=======
+	Width			[640]
+	Height			[480]
+      }
+      WindowState	      "AAAA/wAAAAD9AAAAAgAAAAAAAAC9AAAB+PwCAAAAA/sAAAAWAEQAbwBjAGsAVwBpAGQAZwBlAHQAMwEAAAAxAAAB+AAAA"
+      "AAAAAAA+wAAABYARABvAGMAawBXAGkAZABnAGUAdAA0AAAAAAD/////AAAAAAAAAAD7AAAAUgBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0Ac"
+      "ABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQAAAAAAP////8AAABjAP///wAAAAEAAAAAAAAAAPwCA"
+      "AAAAfsAAABUAEcATABVAEUAMgA6AFAAcgBvAHAAZQByAHQAeQBJAG4AcwBwAGUAYwB0AG8AcgAvAFAAcgBvAHAAZQByAHQAeQAgAEkAbgBzAHAAZ"
+      "QBjAHQAbwByAAAAAAD/////AAAAKwD///8AAAO/AAAEEwAAAAEAAAACAAAAAQAAAAL8AAAAAQAAAAIAAAAP/////wAAAAAA/////wAAAAAAAAAA/"
+      "////wEAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/"
+      "////wEAAAB5/////wAAAAAAAAAA/////wEAAADa/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAFT/////wAAAAAAAAAA/"
+      "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAMr/////wAAAAAAAAAA/"
+      "////wEAAANa/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA"
+>>>>>>> 930c2add515428aee4e4e695a045a1f24be74e46
     }
   }
   HideAutomaticNames	  on
@@ -114,11 +143,19 @@ Model {
   Creator		  "tristan"
   UpdateHistory		  "UpdateHistoryNever"
   ModifiedByFormat	  "%<Auto>"
+<<<<<<< HEAD
   LastModifiedBy	  "matta"
   ModifiedDateFormat	  "%<Auto>"
   LastModifiedDate	  "Tue May 22 13:11:10 2018"
   RTWModifiedTimeStamp	  448895468
   ModelVersionFormat	  "1.%<AutoIncrement:66>"
+=======
+  LastModifiedBy	  "Sam"
+  ModifiedDateFormat	  "%<Auto>"
+  LastModifiedDate	  "Mon May 21 22:51:12 2018"
+  RTWModifiedTimeStamp	  448843871
+  ModelVersionFormat	  "1.%<AutoIncrement:65>"
+>>>>>>> 930c2add515428aee4e4e695a045a1f24be74e46
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
   LibraryLinkDisplay	  "none"
@@ -1799,7 +1836,11 @@ Model {
   }
   System {
     Name		    "WAMVmodel"
+<<<<<<< HEAD
     Location		    [762, 0, 1543, 830]
+=======
+    Location		    [8, 8, 983, 1175]
+>>>>>>> 930c2add515428aee4e4e695a045a1f24be74e46
     Open		    on
     PortBlocksUseCompactNotation off
     SetDomainSpec	    off
@@ -1814,7 +1855,11 @@ Model {
     TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
     TiledPageScale	    1
     ShowPageBoundaries	    off
+<<<<<<< HEAD
     ZoomFactor		    "80"
+=======
+    ZoomFactor		    "125"
+>>>>>>> 930c2add515428aee4e4e695a045a1f24be74e46
     ReportName		    "simulink-default.rpt"
     SIDHighWatermark	    "73"
     Block {
@@ -2133,7 +2178,7 @@ Model {
       Name		      "Scope1"
       SID		      "5"
       Ports		      [3]
-      Position		      [955, 492, 985, 558]
+      Position		      [885, 492, 915, 558]
       ZOrder		      -16
       ScopeSpecificationString "Simulink.scopes.TimeScopeBlockCfg('CurrentConfiguration', extmgr.ConfigurationSet(extm"
       "gr.Configuration('Core','General UI',true,'FigureColor',[0.156862745098039 0.156862745098039 0.156862745098039])"
@@ -2324,6 +2369,20 @@ Model {
       SampleTime	      "-1"
     }
     Block {
+      BlockType		      ToWorkspace
+      Name		      "To Workspace1"
+      SID		      "72"
+      Ports		      [1]
+      Position		      [545, 565, 605, 595]
+      ZOrder		      31
+      VariableName	      "WAMV_U"
+      MaxDataPoints	      "inf"
+      SaveFormat	      "Timeseries"
+      Save2DSignal	      "3-D array (concatenate along third dimension)"
+      FixptAsFi		      on
+      SampleTime	      "-1"
+    }
+    Block {
       BlockType		      ZeroOrderHold
       Name		      "Zero-Order\nHold"
       SID		      "70"
@@ -2332,6 +2391,46 @@ Model {
       SampleTime	      "1/param.sensor_sample_rate"
     }
     Block {
+<<<<<<< HEAD
+=======
+      BlockType		      ZeroOrderHold
+      Name		      "Zero-Order\nHold1"
+      SID		      "73"
+      Position		      [490, 565, 525, 595]
+      ZOrder		      32
+      SampleTime	      "1/param.sensor_sample_rate"
+    }
+    Block {
+      BlockType		      MATLABFcn
+      Name		      "actuatorModel"
+      SID		      "40"
+      Ports		      [1, 1]
+      Position		      [170, 252, 250, 288]
+      ZOrder		      13
+      MATLABFcn		      "wamv_actuatorModel"
+      OutputDimensions	      "3"
+      Port {
+	PortNumber		1
+	Name			"tau"
+      }
+    }
+    Block {
+      BlockType		      MATLABFcn
+      Name		      "controlAllocation"
+      SID		      "39"
+      Ports		      [1, 1]
+      Position		      [230, 442, 310, 478]
+      ZOrder		      14
+      BlockMirror	      on
+      MATLABFcn		      "wamv_controlAllocation"
+      OutputDimensions	      "2"
+      Port {
+	PortNumber		1
+	Name			"u"
+      }
+    }
+    Block {
+>>>>>>> 930c2add515428aee4e4e695a045a1f24be74e46
       BlockType		      Selector
       Name		      "detanu to dnu"
       SID		      "71"
@@ -2447,10 +2546,26 @@ Model {
 	DstPort			1
       }
       Branch {
+<<<<<<< HEAD
 	ZOrder			200
 	Points			[0, 33]
 	DstBlock		"Demux1"
 	DstPort			1
+=======
+	ZOrder			53
+	Points			[0, 65; 96, 0]
+	Branch {
+	  ZOrder		  194
+	  Points		  [0, 55]
+	  DstBlock		  "Zero-Order\nHold1"
+	  DstPort		  1
+	}
+	Branch {
+	  ZOrder		  193
+	  DstBlock		  "Demux1"
+	  DstPort		  1
+	}
+>>>>>>> 930c2add515428aee4e4e695a045a1f24be74e46
       }
     }
     Line {
@@ -2599,6 +2714,19 @@ Model {
       DstPort		      1
     }
     Line {
+<<<<<<< HEAD
+=======
+      Name		      "u"
+      ZOrder		      55
+      Labels		      [2, 0]
+      SrcBlock		      "controlAllocation"
+      SrcPort		      1
+      Points		      [-70, 0]
+      DstBlock		      "actuatorModel"
+      DstPort		      1
+    }
+    Line {
+>>>>>>> 930c2add515428aee4e4e695a045a1f24be74e46
       ZOrder		      122
       SrcBlock		      "Selector"
       SrcPort		      1
@@ -2797,6 +2925,13 @@ Model {
       DstBlock		      "Mux2"
       DstPort		      2
     }
+    Line {
+      ZOrder		      191
+      SrcBlock		      "Zero-Order\nHold1"
+      SrcPort		      1
+      DstBlock		      "To Workspace1"
+      DstPort		      1
+    }
     Annotation {
       SID		      "42"
       Name		      "Control system"
@@ -2810,7 +2945,11 @@ Model {
       BackgroundColor	      "[0.956863, 0.980392, 0.921569]"
       DropShadow	      on
       AnnotationType	      "area_annotation"
+<<<<<<< HEAD
       ZOrder		      178
+=======
+      ZOrder		      174
+>>>>>>> 930c2add515428aee4e4e695a045a1f24be74e46
       FontSize		      12
     }
     Annotation {
@@ -2826,7 +2965,11 @@ Model {
       BackgroundColor	      "[0.996078, 0.968627, 0.905882]"
       DropShadow	      on
       AnnotationType	      "area_annotation"
+<<<<<<< HEAD
       ZOrder		      177
+=======
+      ZOrder		      173
+>>>>>>> 930c2add515428aee4e4e695a045a1f24be74e46
       FontSize		      12
     }
   }

@@ -8,7 +8,10 @@ param.AUV.dofIdx = [1 2 3 4 6]; % N, E, D, psi(yaw)
 param.AUV.m = 10.17; 
 
 % Inertia
-param.AUV.IBb   = diag([0.139 0.171 0.212]);
+param.AUV.IBbx  = 0.139;
+param.AUV.IBby  = 0.171;
+param.AUV.IBbz  = 0.212;
+param.AUV.IBb   = diag([param.AUV.IBbx param.AUV.IBby param.AUV.IBbz]);
 
 % param.AUV.IBb   = [0.98657 0.06241 0.15094;
 %                -0.06085 0.99804 -0.01492;
@@ -22,20 +25,22 @@ param.AUV.rCBb  = [param.AUV.xg;param.AUV.yg;param.AUV.zg];
 param.AUV.SrCBb = skew(param.AUV.rCBb);
 
 % Hydrodynamic parameters
-param.AUV.Xudot = -16.75; param.AUV.Xu = -0.03;     param.AUV.Xauu = -0.05;
-param.AUV.Yvdot = -0.032752; param.AUV.Yrdot = -16.75;  param.AUV.Yv = -0.1;    param.AUV.Yavv = -0.03;
-param.AUV.Nrdot = -0.015;  param.AUV.Nr = -0.02;    param.AUV.Narr = 0;
+param.AUV.Xudot = -0.032752;    param.AUV.Xu = -0.03;            param.AUV.Xauu = -0.05;
+param.AUV.Yvdot = -0.032752;    param.AUV.Yrdot = -0.032752;     param.AUV.Yv = -0.1;    param.AUV.Yavv = -0.03;
+param.AUV.Zwdot = 0.032752;     param.AUV.Zw = -0.05;            param.AUV.Zaww = -0.07;
+param.AUV.Kpdot = -0.015;       param.AUV.Kp = -0.02;            param.AUV.Kapp = 0;
+param.AUV.Nrdot = -0.015;       param.AUV.Nr = -0.02;            param.AUV.Narr = 0;
 
 % Generalised mass matrix (constant in body coordinates)
-param.AUV.MRB = [param.AUV.m.*eye(3) -param.AUV.m*param.AUV.SrCBb;
-             param.AUV.m*param.AUV.SrCBb param.AUV.IBb];
+param.AUV.MRB = [param.AUV.m.*eye(3)            -param.AUV.m*param.AUV.SrCBb;
+                 param.AUV.m*param.AUV.SrCBb    param.AUV.IBb];
 param.AUV.MRB5 = param.AUV.MRB(param.AUV.dofIdx,param.AUV.dofIdx);
 
-MA = diag([param.AUV.Xudot param.AUV.Yvdot param.AUV.Yvdot 0.3864 0.3864]);
+MA = diag([param.AUV.Xudot param.AUV.Yvdot param.AUV.Zwdot param.AUV.Kpdot param.AUV.Nrdot]);
 
 MRBA = MA + param.AUV.MRB5;
 
-Dlin = diag([-param.AUV.Xauu -param.AUV.Yavv -param.AUV.Yavv -param.AUV.Narr -param.AUV.Narr]);
+Dlin = diag([-param.AUV.Xauu -param.AUV.Yavv -param.AUV.Zaww -param.AUV.Kapp -param.AUV.Narr]);
 % Formulate linear surge-sway-yaw state-space model for control design
 param.AUV.Ar = [zeros(5) eye(5);
             zeros(5) -inv(MRBA)*Dlin];
@@ -47,7 +52,7 @@ param.AUV.Cr = [eye(5) zeros(5)];
 param.AUV.Dr = 0;
 
 param.AUV.MatrixAa = [param.AUV.Ar zeros(10,5);
-            -param.AUV.Cr zeros(5)];
+                     -param.AUV.Cr zeros(5)];
         
 param.AUV.MatrixBa = [param.AUV.Br; zeros(5)];
 param.AUV.MatrixCa = [param.AUV.Cr zeros(5,10)];
