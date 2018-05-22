@@ -11,6 +11,8 @@ warning('off', 'MATLAB:legend:IgnoringExtraEntries');
 
 global param map data
 %% Parameter Initialisation
+param.enabled = [0,1,0]; % AUV, WAMV, QUAD
+
 % -- Universal Parameters
 % --- World Parameters
 param.g = 9.81;
@@ -35,47 +37,51 @@ param.GPS.sigma      = eye(3)*5;       % Noise on gps data (m)
 param.tf = 50;
 
 %% Get Vehicle Data
-% -- QUAD data
-Quadrotor();
-data.QUAD.raw.t     = QUAD_states.Time';
-data.QUAD.raw.N     = length(data.QUAD.raw.t);
-data.QUAD.raw.X     = QUAD_states.Data(:, 1:12)';
-data.QUAD.raw.dnu   = QUAD_states.Data(:, 13:18)';
-data.QUAD.U         = QUAD_U.Data';
+%% -- AUV data
+if (param.enabled(1))
+    AUV();
 
-clearvars -except data param map
+    data.AUV.raw.t      = AUV_states.Time';
+    data.AUV.raw.N      = length(data.AUV.raw.t);
+    data.AUV.raw.X      = AUV_states.Data(:, 1:12)';
+    data.AUV.raw.dnu    = AUV_states.Data(:, 13:18)';
+    data.AUV.U         = AUV_U.Data';
+
+    clearvars -except data param map
+end
 
 %% -- WAMV data
-WAMV();
+if (param.enabled(2))
+    WAMV();
 
-data.WAMV.raw.t     = WAMV_states.Time';
-data.WAMV.raw.N     = length(data.WAMV.raw.t);
-data.WAMV.raw.X     = WAMV_states.Data(:, 1:12)';
-data.WAMV.raw.dnu   = WAMV_states.Data(:, 13:18)';
-data.WAMV.U         = WAMV_U.Data';
+    data.WAMV.raw.t     = WAMV_states.Time';
+    data.WAMV.raw.N     = length(data.WAMV.raw.t);
+    data.WAMV.raw.X     = WAMV_states.Data(:, 1:12)';
+    data.WAMV.raw.dnu   = WAMV_states.Data(:, 13:18)';
+    data.WAMV.U         = WAMV_U.Data';
 
-clearvars -except data param map
- 
-%% -- AUV data
-AUV();
+    clearvars -except data param map
+end
+% -- QUAD data
+if (param.enabled(3))
+    Quadrotor();
+    data.QUAD.raw.t     = QUAD_states.Time';
+    data.QUAD.raw.N     = length(data.QUAD.raw.t);
+    data.QUAD.raw.X     = QUAD_states.Data(:, 1:12)';
+    data.QUAD.raw.dnu   = QUAD_states.Data(:, 13:18)';
+    data.QUAD.U         = QUAD_U.Data';
 
-data.AUV.raw.t      = AUV_states.Time';
-data.AUV.raw.N      = length(data.AUV.raw.t);
-data.AUV.raw.X      = AUV_states.Data(:, 1:12)';
-data.AUV.raw.dnu    = AUV_states.Data(:, 13:18)';
-data.AUV.U         = AUV_U.Data';
-
-clearvars -except data param map
-
+    clearvars -except data param map
+end
 %% Simulate Sensor Data
 % Get Map data
 Map();
 
 % Get all Data
-for t = 1:param.tf*param.sensor_sample_rate
-    data.RAW.All  = GetRawData([data.AUV.X(:,t); zeros(12,1); data.QUAD.X(:,t)], ...
-                         [data.AUV.dnu(:,t); zeros(6,1); data.QUAD.dnu(:,t)]);
-end
+% for t = 1:param.tf*param.sensor_sample_rate
+%     data.RAW.All  = GetRawData([data.AUV.X(:,t); zeros(12,1); data.QUAD.X(:,t)], ...
+%                          [data.AUV.dnu(:,t); zeros(6,1); data.QUAD.dnu(:,t)]);
+% end
 % -- QUAD measurement simulation
 
 % -- WAMV measurement simulation
@@ -91,108 +97,178 @@ end
 % Plot states (True, est. mono, est. distributed)
 % ETA data
 f = figure(1);
-columns = 3;
+columns = sum(param.enabled);
 rows = 6;
-% --- QUAD ETA data
 
-titles = {{'QUAD','NORTH'}, {'EAST'}, {'DOWN'}, {'ROLL '}, {'PITCH'}, {'YAW'}};
-ylabels = {'N (m)', 'E (m)', 'D (m)', '$\phi$ ($^{\circ}$)', '$\theta$ ($^{\circ}$)', '$\psi$ ($^{\circ}$)'};
-xlabels = {'','','','','','Time (s)'};
-scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
-for row=1:rows
-    subplot(6,3,(row-1)*columns + 1);
-    plot(data.QUAD.raw.t, data.QUAD.raw.X(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
-    grid on;
-    t = titles(row);
-    title(t{:}, 'Interpreter', 'latex');
-    ylabel(ylabels(row), 'Interpreter', 'latex');
-    xlabel(xlabels(row), 'Interpreter', 'latex');
-    legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+% AUV ETA data
+if (param.enabled(1))
+    titles = {{'AUV','NORTH'}, {'EAST'}, {'DOWN'}, {'ROLL '}, {'PITCH'}, {'YAW'}};
+    ylabels = {'N (m)', 'E (m)', 'D (m)', '$\phi$ ($^{\circ}$)', '$\theta$ ($^{\circ}$)', '$\psi$ ($^{\circ}$)'};
+    xlabels = {'','','','','','Time (s)'};
+    scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
+    for row=1:rows
+        subplot(rows,columns,(row-1)*columns + 1);
+        plot(data.AUV.raw.t, data.AUV.raw.X(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        grid on;
+        t = titles(row);
+        title(t{:}, 'Interpreter', 'latex');
+        ylabel(ylabels(row), 'Interpreter', 'latex');
+        xlabel(xlabels(row), 'Interpreter', 'latex');
+        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+    end
 end
 
 % WAMV ETA data
-titles = {{'WAMV','NORTH'}, {'EAST'}, {'DOWN'}, {'ROLL '}, {'PITCH'}, {'YAW'}};
-ylabels = {'N (m)', 'E (m)', 'D (m)', '$\phi$ ($^{\circ}$)', '$\theta$ ($^{\circ}$)', '$\psi$ ($^{\circ}$)'};
-xlabels = {'','','','','','Time (s)'};
-scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
-for row=1:rows
-    subplot(6,3,(row-1)*columns + 2);
-    plot(data.WAMV.raw.t, data.WAMV.raw.X(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
-    grid on;
-    t = titles(row);
-    title(t{:}, 'Interpreter', 'latex');
-    ylabel(ylabels(row), 'Interpreter', 'latex');
-    xlabel(xlabels(row), 'Interpreter', 'latex');
-    legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+if (param.enabled(2))
+    titles = {{'WAMV','NORTH'}, {'EAST'}, {'DOWN'}, {'ROLL '}, {'PITCH'}, {'YAW'}};
+    ylabels = {'N (m)', 'E (m)', 'D (m)', '$\phi$ ($^{\circ}$)', '$\theta$ ($^{\circ}$)', '$\psi$ ($^{\circ}$)'};
+    xlabels = {'','','','','','Time (s)'};
+    scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
+    for row=1:rows
+        subplot(rows,columns,(row-1)*columns + sum(param.enabled(1:2)));
+        plot(data.WAMV.raw.t, data.WAMV.raw.X(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        grid on;
+        t = titles(row);
+        title(t{:}, 'Interpreter', 'latex');
+        ylabel(ylabels(row), 'Interpreter', 'latex');
+        xlabel(xlabels(row), 'Interpreter', 'latex');
+        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+    end
 end
-
-% AUV ETA data
-titles = {{'AUV','NORTH'}, {'EAST'}, {'DOWN'}, {'ROLL '}, {'PITCH'}, {'YAW'}};
-ylabels = {'N (m)', 'E (m)', 'D (m)', '$\phi$ ($^{\circ}$)', '$\theta$ ($^{\circ}$)', '$\psi$ ($^{\circ}$)'};
-xlabels = {'','','','','','Time (s)'};
-scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
-for row=1:rows
-    subplot(6,3,(row-1)*columns + 3);
-    plot(data.AUV.raw.t, data.AUV.raw.X(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
-    grid on;
-    t = titles(row);
-    title(t{:}, 'Interpreter', 'latex');
-    ylabel(ylabels(row), 'Interpreter', 'latex');
-    xlabel(xlabels(row), 'Interpreter', 'latex');
-    legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+% --- QUAD ETA data
+if (param.enabled(3))
+    titles = {{'QUAD','NORTH'}, {'EAST'}, {'DOWN'}, {'ROLL '}, {'PITCH'}, {'YAW'}};
+    ylabels = {'N (m)', 'E (m)', 'D (m)', '$\phi$ ($^{\circ}$)', '$\theta$ ($^{\circ}$)', '$\psi$ ($^{\circ}$)'};
+    xlabels = {'','','','','','Time (s)'};
+    scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
+    for row=1:rows
+        subplot(rows,columns,(row-1)*columns + sum(param.enabled));
+        plot(data.QUAD.raw.t, data.QUAD.raw.X(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        grid on;
+        t = titles(row);
+        title(t{:}, 'Interpreter', 'latex');
+        ylabel(ylabels(row), 'Interpreter', 'latex');
+        xlabel(xlabels(row), 'Interpreter', 'latex');
+        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+    end
 end
-
 % ---------- NU data
 figure(2);
-columns = 3;
-rows = 6;
-% ---------- QUAD NU data
+% ---------- AUV NU data
+if (param.enabled(1))
+    titles = {{'AUV';'SURGE'}, 'SWAY', 'HEAVE', 'ROLL RATE', 'PITCH RATE', 'YAW RATE'};
+    ylabels = {'U (m)', 'V (m)', 'W (m)', 'P ($^{\circ}$/s)', 'Q ($^{\circ}$/s)', 'R ($^{\circ}$/s)'};
+    xlabels = {'','','','','','Time (s)'};
+    scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
+    for row=1:rows
+        subplot(rows,columns,(row-1)*columns + 1);
+        plot(data.AUV.raw.t, data.AUV.raw.X(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        grid on;
+        t = titles(row);
+        title(t{:}, 'Interpreter', 'latex');
+        ylabel(ylabels(row), 'Interpreter', 'latex');
+        xlabel(xlabels(row), 'Interpreter', 'latex');
+        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+    end
 
-titles = {{'QUAD';'SURGE'}, 'SWAY', 'HEAVE', 'ROLL RATE', 'PITCH RATE', 'YAW RATE'};
-ylabels = {'U (m)', 'V (m)', 'W (m)', 'P ($^{\circ}$/s)', 'Q ($^{\circ}$/s)', 'R ($^{\circ}$/s)'};
-xlabels = {'','','','','','Time (s)'};
-scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
-for row=1:rows
-    subplot(6,3,(row-1)*columns + 1);
-    plot(data.QUAD.raw.t, data.QUAD.raw.X(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
-    grid on;
-    t = titles(row);
-    title(t{:}, 'Interpreter', 'latex');
-    ylabel(ylabels(row), 'Interpreter', 'latex');
-    xlabel(xlabels(row), 'Interpreter', 'latex');
-    legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
 end
 % ---------- WAMV NU data
-
-titles = {{'WAMV';'SURGE'}, 'SWAY', 'HEAVE', 'ROLL RATE', 'PITCH RATE', 'YAW RATE'};
-ylabels = {'U (m)', 'V (m)', 'W (m)', 'P ($^{\circ}$/s)', 'Q ($^{\circ}$/s)', 'R ($^{\circ}$/s)'};
-xlabels = {'','','','','','Time (s)'};
-scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
-for row=1:rows
-    subplot(6,3,(row-1)*columns + 2);
-    plot(data.WAMV.raw.t, data.WAMV.raw.X(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
-    grid on;
-    t = titles(row);
-    title(t{:}, 'Interpreter', 'latex');
-    ylabel(ylabels(row), 'Interpreter', 'latex');
-    xlabel(xlabels(row), 'Interpreter', 'latex');
-    legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+if (param.enabled(2))
+    titles = {{'WAMV';'SURGE'}, 'SWAY', 'HEAVE', 'ROLL RATE', 'PITCH RATE', 'YAW RATE'};
+    ylabels = {'U (m)', 'V (m)', 'W (m)', 'P ($^{\circ}$/s)', 'Q ($^{\circ}$/s)', 'R ($^{\circ}$/s)'};
+    xlabels = {'','','','','','Time (s)'};
+    scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
+    for row=1:rows
+        subplot(rows,columns,(row-1)*columns + sum(param.enabled(1:2)));
+        plot(data.WAMV.raw.t, data.WAMV.raw.X(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        grid on;
+        t = titles(row);
+        title(t{:}, 'Interpreter', 'latex');
+        ylabel(ylabels(row), 'Interpreter', 'latex');
+        xlabel(xlabels(row), 'Interpreter', 'latex');
+        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+    end
 end
-% ---------- AUV NU data
+% ---------- QUAD NU data
+if (param.enabled(3))
+    titles = {{'QUAD';'SURGE'}, 'SWAY', 'HEAVE', 'ROLL RATE', 'PITCH RATE', 'YAW RATE'};
+    ylabels = {'U (m)', 'V (m)', 'W (m)', 'P ($^{\circ}$/s)', 'Q ($^{\circ}$/s)', 'R ($^{\circ}$/s)'};
+    xlabels = {'','','','','','Time (s)'};
+    scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
+    for row=1:rows
+        subplot(rows,columns,(row-1)*columns + sum(param.enabled));
+        plot(data.QUAD.raw.t, data.QUAD.raw.X(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        grid on;
+        t = titles(row);
+        title(t{:}, 'Interpreter', 'latex');
+        ylabel(ylabels(row), 'Interpreter', 'latex');
+        xlabel(xlabels(row), 'Interpreter', 'latex');
+        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+    end
+end
 
-titles = {{'AUV';'SURGE'}, 'SWAY', 'HEAVE', 'ROLL RATE', 'PITCH RATE', 'YAW RATE'};
-ylabels = {'U (m)', 'V (m)', 'W (m)', 'P ($^{\circ}$/s)', 'Q ($^{\circ}$/s)', 'R ($^{\circ}$/s)'};
-xlabels = {'','','','','','Time (s)'};
-scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
-for row=1:rows
-    subplot(6,3,(row-1)*columns + 3);
-    plot(data.AUV.raw.t, data.AUV.raw.X(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
-    grid on;
-    t = titles(row);
-    title(t{:}, 'Interpreter', 'latex');
-    ylabel(ylabels(row), 'Interpreter', 'latex');
-    xlabel(xlabels(row), 'Interpreter', 'latex');
-    legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+% ---------- TauB data
+figure(3);
+% ---------- AUV TauB data
+if (param.enabled(1))
+    titles = {{'AUV';'SURGE Forces'}, 'SWAY Forces', 'HEAVE Forces', 'ROLL Forces', 'PITCH Forces', 'YAW Forces'};
+    ylabels = {'X (N)', 'V (N)', 'Z (N)', 'L (Nm)', 'M (Nm)', 'N (Nm)'};
+    xlabels = {'','','','','','Time (s)'};
+    
+    TauB = param.AUV.MRB*data.AUV.raw.dnu;
+    
+    for row=1:rows
+        subplot(rows,columns,(row-1)*columns + 1);
+        
+        plot(data.AUV.raw.t, TauB(row,:));% data.QUAD.filtered.t, data.QUAD.filtered.
+        grid on;
+        t = titles(row);
+        title(t{:}, 'Interpreter', 'latex');
+        ylabel(ylabels(row), 'Interpreter', 'latex');
+        xlabel(xlabels(row), 'Interpreter', 'latex');
+        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+    end
+
+end
+% ---------- WAMV NU data
+if (param.enabled(2))
+    titles = {{'WAMV';'SURGE Forces'}, 'SWAY Forces', 'HEAVE Forces', 'ROLL Forces', 'PITCH Forces', 'YAW Forces'};
+    ylabels = {'X (N)', 'V (N)', 'Z (N)', 'L (Nm)', 'M (Nm)', 'N (Nm)'};
+    xlabels = {'','','','','','Time (s)'};
+    
+    TauB = param.WAMV.MRB*data.WAMV.raw.dnu;
+    
+    for row=1:rows
+        subplot(rows,columns,(row-1)*columns + sum(param.enabled(1:2)));
+        
+        plot(data.WAMV.raw.t, TauB(row,:));% data.QUAD.filtered.t, data.QUAD.filtered.
+        grid on;
+        t = titles(row);
+        title(t{:}, 'Interpreter', 'latex');
+        ylabel(ylabels(row), 'Interpreter', 'latex');
+        xlabel(xlabels(row), 'Interpreter', 'latex');
+        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+    end
+end
+% ---------- QUAD NU data
+if (param.enabled(3))
+    titles = {{'QUAD';'SURGE Forces'}, 'SWAY Forces', 'HEAVE Forces', 'ROLL Forces', 'PITCH Forces', 'YAW Forces'};
+    ylabels = {'X (N)', 'V (N)', 'Z (N)', 'L (Nm)', 'M (Nm)', 'N (Nm)'};
+    xlabels = {'','','','','','Time (s)'};
+    
+    TauB = param.QUAD.MRB*data.QUAD.raw.dnu;
+    
+    for row=1:rows
+        subplot(rows,columns,(row-1)*columns + sum(param.enabled));
+        
+        plot(data.QUAD.raw.t, TauB(row,:));% data.QUAD.filtered.t, data.QUAD.filtered.
+        grid on;
+        t = titles(row);
+        title(t{:}, 'Interpreter', 'latex');
+        ylabel(ylabels(row), 'Interpreter', 'latex');
+        xlabel(xlabels(row), 'Interpreter', 'latex');
+        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+    end
 end
 
 clearvars -except data param map
