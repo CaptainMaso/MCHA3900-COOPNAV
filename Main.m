@@ -82,6 +82,11 @@ data.ALL.raw = zeros(,param.tf*param.sensor_sample_rate);
 for t = 1:param.tf*param.sensor_sample_rate
     tmp  = GetRawData([data.AUV.raw.X(:,t); data.WAMV.raw.X(:,t); data.QUAD.raw.X(:,t)], ...
                                     [data.AUV.raw.dnu(:,t); data.WAMV.raw.dnu(:,t); data.QUAD.raw.dnu(:,t)]);
+=======
+for t = 1:param.tf*param.sensor_sample_rate
+    data.RAW.All  = GetRawData([data.AUV.raw.X(:,t); zeros(12,1); data.QUAD.raw.X(:,t)], ...
+                         [data.AUV.raw.dnu(:,t); zeros(6,1); data.QUAD.raw.dnu(:,t)]);
+>>>>>>> 3bcf1ee3cd8c6de0136cf230830cf23ce7330c83
 end
 
 %% KALMAN FILTER THE FUCK OUT OF SHIT
@@ -98,6 +103,24 @@ end
 %    
 %    %MERGE
 % end
+N = data.AUV.raw.N;
+U = data.AUV.U;
+Y = 1;
+for t = 1:N
+   % UKF AUV
+
+   
+   [mu_post, S_post] = UKF_MU(Y, mu_pri, S_pri, U, measurementModelAUV);
+   [mu_next, S_next] = UKF_PU(mu_pri, S_pri, U, processModelMonolithic);
+   % UKF WAMV
+   
+   
+   %UKF QUAD
+   
+   
+   
+   %MERGE
+end
 
 %% PLOT ALL THE THINGS (For now)
 % Plot states (True, est. mono, est. distributed)

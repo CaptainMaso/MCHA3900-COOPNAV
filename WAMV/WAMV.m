@@ -1,9 +1,6 @@
 %% UUV model in the horizontal plane
 global param
 
-param.tf = 60;
-param.sensor_sample_rate = 100;
-param.g = 9.81;
 param.WAMV.T = 100;
 
 % Indices for degrees of freedom of interest
