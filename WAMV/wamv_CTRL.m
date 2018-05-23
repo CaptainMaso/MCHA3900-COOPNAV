@@ -14,11 +14,15 @@ rWDn = [eta(1) - ref(1);
         eta(2) - ref(2)];
 ePsi = psi - ref(3);
 
-TauPsi  = -param.WAMV.Kpsi*ePsi - param.WAMV.Kdpsi*nu(3);% - param.WAMV.Kxpsi*norm(eNE)*atan2(eN, eE);
+beta = atan2(rWDn(2),-rWDn(1));
+gamma = psi - beta;
 
-RNB = [cos(psi) -sin(psi); sin(psi) cos(psi)];
+r = -norm(rWDn);
+eNb = r*cos(gamma);
+eEb = r*sin(gamma);
 
-rWDn = RNB'*rWDn;
-TauNE   = -param.WAMV.Kx*rWDn - param.WAMV.Kdx*nu(1:2);
+TauPsi  = -param.WAMV.Kpsi*ePsi - param.WAMV.Kdpsi*nu(3) - param.WAMV.Kdxpsi*r*gamma;% - param.WAMV.Kxpsi*norm(eNE)*atan2(eN, eE);
+TauN   = -param.WAMV.KN*eNb - param.WAMV.KdN*nu(1);
+TauE   = -param.WAMV.KE*eEb - param.WAMV.KdE*nu(2);
 
-TauBstar = [TauNE;TauPsi];
+TauBstar = [TauN;TauE;TauPsi];
