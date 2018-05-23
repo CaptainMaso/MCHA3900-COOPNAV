@@ -29,6 +29,7 @@ param.AUV.Xudot = -0.032752;    param.AUV.Xu = -0.03;            param.AUV.Xauu 
 param.AUV.Yvdot = -0.032752;    param.AUV.Yrdot = -0.032752;     param.AUV.Yv = -0.1;    param.AUV.Yavv = -0.03;
 param.AUV.Zwdot = 0.032752;     param.AUV.Zw = -0.05;            param.AUV.Zaww = -0.07;
 param.AUV.Kpdot = -0.015;       param.AUV.Kp = -0.02;            param.AUV.Kapp = 0;
+param.AUV.Mqdot = -0.015;       param.AUV.Mq = -0.02;            param.AUV.Maqq = 0;
 param.AUV.Nrdot = -0.015;       param.AUV.Nr = -0.02;            param.AUV.Narr = 0;
 
 % Generalised mass matrix (constant in body coordinates)

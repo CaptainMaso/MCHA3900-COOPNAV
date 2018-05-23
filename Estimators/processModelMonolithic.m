@@ -15,7 +15,7 @@ X_bias  = Xm(37:45);   % Only estimating 9 gyro biases, all other biases can be 
 
 dX_AUV  = auv_detanu( [U_AUV ; X_AUV ]); 
 
-dX_WAMV = 0*wamv_detanu([U_WAMV; X_WAMV]);
+dX_WAMV = wamv_detanu([U_WAMV; X_WAMV]);
 
 dX_QUAD = quad_detanu([U_QUAD; X_QUAD]);
 

@@ -40,14 +40,8 @@ Sp(:,:,1)   = S0;
 
 % Run UKF algorithm
 for t = 1:N
-   % Measurement Update
-   jointFunc = @(x) augmentIdentityAdapter(measurementModel, x, U(:,t));
-   [muxy,Syx] = unscentedTransform(mup(:,t), Sp(:,:,t), jointFunc);
-   [muf(:,t), Sf(:,:,t)] = conditionGaussionOnMarginal(muxy, Syx, Y(:,t));
-   
-   % Prediction Update
-   processFunc = @(x) processModel(muf(:,t), U(:,t));
-   [mup(:,t+1), Sp(:,:,t+1)] = unscentedTransform(muf(:,t), Sf(:,:,t), processFunc);
+    [muf(:,t), Sf(:,:,t)]   = UKF_MU(Y(:,t), mup(:,t), Sp(:,:,t), U(:,t-1), measurementModel);
+    [mup(:,t+1), Sp(:,:,t)] = UKF_PU(muf(:,t), Sf(:,:,t), U(:,t), processModel);
 end
 
 XfHist = muf;
