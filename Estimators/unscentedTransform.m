@@ -38,12 +38,12 @@ if nargin >= 4
 end
 
 % Transform the sigma points through the function
-[temp,~,SR] = h(xsigma(:,nsigma));  	% Use function eval at mean to extract SR and
+[temp,SR] = h(xsigma(:,nsigma));  	% Use function eval at mean to extract SR and
 ny = length(temp);                      % determine output dimension and
 ysigma = zeros(ny,nsigma);              % initialise output sigma points
 ysigma(:,nsigma) = temp;
 for i = 1:nsigma-1
-    ysigma(:,i) = h(xsigma(:,i));
+    [ysigma(:,i),~] = h(xsigma(:,i));
 end
 
 % Unscented mean

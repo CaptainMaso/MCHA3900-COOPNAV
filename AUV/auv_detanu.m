@@ -27,17 +27,17 @@ CA = [
 [        0,              0,              0,         pauv.Zwdot*w,        0,              -pauv.Xudot*u];
 [        0,               0,             0,         -pauv.Yvdot*v,  pauv.Xudot*u,               0];
 [        0,         -pauv.Zwdot*w,  pauv.Yvdot*v,        0,         -pauv.Nrdot*r,              pauv.Mqdot*q];
-[  pauv.Zwdot*w,        0,          -pauv.Xudot*u,   Npauv.rdot*r,        0,            -pauv.Kpdot*p];
+[  pauv.Zwdot*w,        0,          -pauv.Xudot*u,   pauv.Nrdot*r,        0,            -pauv.Kpdot*p];
 [ -pauv.Yvdot*v,     pauv.Xudot*u,        0,        -pauv.Mqdot*q,  pauv.Kpdot*p,            0]
 ];
  
 Dm = diag([-pauv.Xu-pauv.Xauu*abs(u),-pauv.Yv-pauv.Yavv*abs(v),-pauv.Zw-pauv.Zaww*abs(w),-pauv.Kp-pauv.Kapp*abs(p),-pauv.Mq-pauv.Maqq*abs(q),-pauv.Nr-pauv.Narr*abs(r)]);
 
-NB = [0;0;0.2*9.81;0;0];      % Net bouyancy
+NB = [0;0;0.2*9.81;0;0;0];      % Net bouyancy
 deta6 = J*nu6;
 
 
-dnu6 = inv(pauv.MRB+MA)*(tau6 -(CRB+CA)*nu6 - Dm*nu6 + NB);
+dnu6 = (pauv.MRB+MA)\(tau6 -(CRB+CA)*nu6 - Dm*nu6 + NB);
 
 
 dx = [deta6;dnu6];

@@ -11,7 +11,7 @@ warning('off', 'MATLAB:legend:IgnoringExtraEntries');
 
 global param map data
 %% Parameter Initialisation
-param.enabled = [0,1,0]; % AUV, WAMV, QUAD
+param.enabled = [1,1,1]; % AUV, WAMV, QUAD
 
 % -- Universal Parameters
 % --- World Parameters
@@ -82,16 +82,21 @@ Map();
 %     data.RAW.All  = GetRawData([data.AUV.X(:,t); zeros(12,1); data.QUAD.X(:,t)], ...
 %                          [data.AUV.dnu(:,t); zeros(6,1); data.QUAD.dnu(:,t)]);
 % end
-% -- QUAD measurement simulation
-
-% -- WAMV measurement simulation
-
-% -- AUV measurement simulation
-
-% -- Relative measurement simulation
 
 %% KALMAN FILTER THE FUCK OUT OF SHIT
-% Lol
+% for t = 1:N
+%    % UKF AUV
+%    
+%    
+%    % UKF WAMV
+%    
+%    
+%    %UKF QUAD
+%    
+%    
+%    
+%    %MERGE
+% end
 
 %% PLOT ALL THE THINGS (For now)
 % Plot states (True, est. mono, est. distributed)
@@ -212,7 +217,7 @@ figure(3);
 % ---------- AUV TauB data
 if (param.enabled(1))
     titles = {{'AUV';'SURGE Forces'}, 'SWAY Forces', 'HEAVE Forces', 'ROLL Forces', 'PITCH Forces', 'YAW Forces'};
-    ylabels = {'X (N)', 'V (N)', 'Z (N)', 'L (Nm)', 'M (Nm)', 'N (Nm)'};
+    ylabels = {'X (N)', 'V (N)', 'Z (N)', 'K (Nm)', 'M (Nm)', 'N (Nm)'};
     xlabels = {'','','','','','Time (s)'};
     
     TauB = param.AUV.MRB*data.AUV.raw.dnu;
@@ -233,7 +238,7 @@ end
 % ---------- WAMV NU data
 if (param.enabled(2))
     titles = {{'WAMV';'SURGE Forces'}, 'SWAY Forces', 'HEAVE Forces', 'ROLL Forces', 'PITCH Forces', 'YAW Forces'};
-    ylabels = {'X (N)', 'V (N)', 'Z (N)', 'L (Nm)', 'M (Nm)', 'N (Nm)'};
+    ylabels = {'X (N)', 'V (N)', 'Z (N)', 'K (Nm)', 'M (Nm)', 'N (Nm)'};
     xlabels = {'','','','','','Time (s)'};
     
     TauB = param.WAMV.MRB*data.WAMV.raw.dnu;
@@ -253,7 +258,7 @@ end
 % ---------- QUAD NU data
 if (param.enabled(3))
     titles = {{'QUAD';'SURGE Forces'}, 'SWAY Forces', 'HEAVE Forces', 'ROLL Forces', 'PITCH Forces', 'YAW Forces'};
-    ylabels = {'X (N)', 'V (N)', 'Z (N)', 'L (Nm)', 'M (Nm)', 'N (Nm)'};
+    ylabels = {'X (N)', 'V (N)', 'Z (N)', 'K (Nm)', 'M (Nm)', 'N (Nm)'};
     xlabels = {'','','','','','Time (s)'};
     
     TauB = param.QUAD.MRB*data.QUAD.raw.dnu;
