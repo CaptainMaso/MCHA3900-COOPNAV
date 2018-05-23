@@ -23,15 +23,26 @@ param.IMU.samplerate = 100;
 
 % ---- LPS parameters
 param.LPS.sigma = 0.1;          % Noise on LPS data (m)
+param.LPS.datalength = 1;
+
 % ---- Visual Bearing (VB) parameters
 param.VB.sigma      = eye(3)*0.01;      % Noise on VB data (rad)
+param.VB.datalength = 3;
+
 % ---- IMU parameters
 param.IMU.acc_sigma = eye(3)*0.01;      % Noise on accelerometer data (m/s^2)
 param.IMU.gyro_sigma = eye(3)*0.01;     % Noise on gyro data (rad/s)
 param.IMU.gyro_bias  = [0.4, -0.2, 0.6]';
 param.IMU.magn_sigma = eye(3)*0.01;
+param.IMU.datalength = 9;
+
 % ---- GPS parameters
 param.GPS.sigma      = eye(3)*5;       % Noise on gps data (m)
+param.GPS.datalength = 3;
+
+% ---- HAP parameters
+param.HAP.sigma      = eye(3)*3;       % Noise on HAP data (m)
+param.HAP.datalength = 3;
 
 % --- Simulation Parameters
 param.tf = 50;
@@ -45,8 +56,11 @@ if (param.enabled(1))
     data.AUV.raw.N      = length(data.AUV.raw.t);
     data.AUV.raw.X      = AUV_states.Data(:, 1:12)';
     data.AUV.raw.dnu    = AUV_states.Data(:, 13:18)';
-    data.AUV.U         = AUV_U.Data';
+    data.AUV.U          = AUV_U.Data';
 
+    param.AUV.datalength = param.IMU.datalength + ...
+                           param.HAP.datalength;
+    
     clearvars -except data param map
 end
 
@@ -59,6 +73,10 @@ if (param.enabled(2))
     data.WAMV.raw.X     = WAMV_states.Data(:, 1:12)';
     data.WAMV.raw.dnu   = WAMV_states.Data(:, 13:18)';
     data.WAMV.U         = WAMV_U.Data';
+    
+    param.WAMV.datalength = param.IMU.datalength + ...
+                            param.GPS.datalength  + ...
+                            param.VB.datalength * map.VB.N;
 
     clearvars -except data param map
 end
@@ -70,6 +88,11 @@ if (param.enabled(3))
     data.QUAD.raw.X     = QUAD_states.Data(:, 1:12)';
     data.QUAD.raw.dnu   = QUAD_states.Data(:, 13:18)';
     data.QUAD.U         = QUAD_U.Data';
+    
+    param.QUAD.datalength = param.IMU.datalength + ...
+                            param.GPS.datalength  + ...
+                            param.VB.datalength*(map.VB.N+1) + ...
+                            param.LPS.datalength*(map.LPS.N+1);
 
     clearvars -except data param map
 end
@@ -78,15 +101,12 @@ end
 Map();
 
 % Get all Data
-data.ALL.raw = zeros(,param.tf*param.sensor_sample_rate);
+data.ALL.raw = zeros(param.AUV.datalength + ...
+                     param.WAMV.datalength + ...
+                     param.QUAD.datalength ,param.tf*param.sensor_sample_rate);
 for t = 1:param.tf*param.sensor_sample_rate
-    tmp  = GetRawData([data.AUV.raw.X(:,t); data.WAMV.raw.X(:,t); data.QUAD.raw.X(:,t)], ...
+    data.ALL.raw(:,t)  = GetRawData([data.AUV.raw.X(:,t); data.WAMV.raw.X(:,t); data.QUAD.raw.X(:,t)], ...
                                     [data.AUV.raw.dnu(:,t); data.WAMV.raw.dnu(:,t); data.QUAD.raw.dnu(:,t)]);
-=======
-for t = 1:param.tf*param.sensor_sample_rate
-    data.RAW.All  = GetRawData([data.AUV.raw.X(:,t); zeros(12,1); data.QUAD.raw.X(:,t)], ...
-                         [data.AUV.raw.dnu(:,t); zeros(6,1); data.QUAD.raw.dnu(:,t)]);
->>>>>>> 3bcf1ee3cd8c6de0136cf230830cf23ce7330c83
 end
 
 %% KALMAN FILTER THE FUCK OUT OF SHIT
@@ -103,24 +123,24 @@ end
 %    
 %    %MERGE
 % end
-N = data.AUV.raw.N;
-U = data.AUV.U;
-Y = 1;
-for t = 1:N
-   % UKF AUV
-
-   
-   [mu_post, S_post] = UKF_MU(Y, mu_pri, S_pri, U, measurementModelAUV);
-   [mu_next, S_next] = UKF_PU(mu_pri, S_pri, U, processModelMonolithic);
-   % UKF WAMV
-   
-   
-   %UKF QUAD
-   
-   
-   
-   %MERGE
-end
+% N = data.AUV.raw.N;
+% U = data.AUV.U;
+% Y = 1;
+% for t = 1:N
+%    % UKF AUV
+% 
+%    
+%    [mu_post, S_post] = UKF_MU(Y, mu_pri, S_pri, U, measurementModelAUV);
+%    [mu_next, S_next] = UKF_PU(mu_pri, S_pri, U, processModelMonolithic);
+%    % UKF WAMV
+%    
+%    
+%    %UKF QUAD
+%    
+%    
+%    
+%    %MERGE
+% end
 
 %% PLOT ALL THE THINGS (For now)
 % Plot states (True, est. mono, est. distributed)
