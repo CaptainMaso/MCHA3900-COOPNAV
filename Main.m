@@ -78,15 +78,10 @@ end
 Map();
 
 % Get all Data
-data.ALL.raw = zeros(,param.tf*param.sensor_sample_rate);
+data.ALL.raw = zeros(0,param.tf*param.sensor_sample_rate);
 for t = 1:param.tf*param.sensor_sample_rate
     tmp  = GetRawData([data.AUV.raw.X(:,t); data.WAMV.raw.X(:,t); data.QUAD.raw.X(:,t)], ...
                                     [data.AUV.raw.dnu(:,t); data.WAMV.raw.dnu(:,t); data.QUAD.raw.dnu(:,t)]);
-=======
-for t = 1:param.tf*param.sensor_sample_rate
-    data.RAW.All  = GetRawData([data.AUV.raw.X(:,t); zeros(12,1); data.QUAD.raw.X(:,t)], ...
-                         [data.AUV.raw.dnu(:,t); zeros(6,1); data.QUAD.raw.dnu(:,t)]);
->>>>>>> 3bcf1ee3cd8c6de0136cf230830cf23ce7330c83
 end
 
 %% KALMAN FILTER THE FUCK OUT OF SHIT
@@ -105,7 +100,9 @@ end
 % end
 N = data.AUV.raw.N;
 U = data.AUV.U;
-Y = 1;
+Y = tmp(1:12,:);
+mu_pri = zeros(12,1);
+S_pri = [ones(3,1)*0.1;ones(3,1)*0.01;ones(3,1)*0.1;ones(3,1)*10];
 for t = 1:N
    % UKF AUV
 

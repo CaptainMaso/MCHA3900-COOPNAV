@@ -1,6 +1,5 @@
-function [yx,SRR] = augmentIdentityAdapter(f,x,u,param)
-
-[y,SR] = f(x,u,param);
+function [yx,SRR] = augmentIdentityAdapter(f,x,u)
+[y,SR] = f(x,u);
 
 yx = [y;x];
 

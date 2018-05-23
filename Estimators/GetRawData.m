@@ -1,21 +1,6 @@
 function Yraw = GetRawData(Xm, dnuM)
 global param map
 
-monolithicOffset = 12*0; % Offset 0 for AUV
-auv_etanu   = Xm(1+monolithicOffset:12+monolithicOffset);
-monolithicOffset = 6*0; % Offset 1 for AUV
-auv_dnu     = dnuM(1+monolithicOffset:6+monolithicOffset);
-
-monolithicOffset = 12*1; % Offset 1 for WAMV
-wamv_etanu  = Xm(1+monolithicOffset:12+monolithicOffset);
-monolithicOffset = 6*1; % Offset 1 for WAMV
-wamv_dnu    = dnuM(1+monolithicOffset:6+monolithicOffset);
-
-monolithicOffset = 12*2; % Offset 2 for QUAD
-quad_etanu  = Xm(1+monolithicOffset:12+monolithicOffset);
-monolithicOffset = 6*2;  % Offset 2 for QUAD
-quad_dnu    = dnuM(1+monolithicOffset:6+monolithicOffset);
-=======
 monolithicOffset_Xm = 12*0; % Offset 0 for AUV
 monolithicOffset_dnu = 6*0;
 auv_etanu = Xm(1+monolithicOffset_Xm:12+monolithicOffset_Xm);
@@ -30,7 +15,6 @@ monolithicOffset_Xm = 12*2; % Offset 2 for QUAD
 monolithicOffset_dnu = 6*2;
 quad_etanu = Xm(1+monolithicOffset_Xm:12+monolithicOffset_Xm);
 quad_dnu = dnuM(1+monolithicOffset_dnu:6+monolithicOffset_dnu);
->>>>>>> 3bcf1ee3cd8c6de0136cf230830cf23ce7330c83
 
 % ----------- AUV DATA
 % Gets AUV IMU data
