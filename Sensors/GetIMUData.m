@@ -18,7 +18,7 @@ rMBb = [0;0;0];
 vBNb = nu(1:3);
 wBNb = nu(4:6);
 Rmb = eye(3); %-> IMU is at COG for vessel
-aimu = Rmb*([eye(3), -skew(rMBb)]*dnu) + Rm*(skew(wBNb)*(skew(wBNb)*rMBb + vBNb)-Rnb'*gn);
+aimu = Rmb*([eye(3), -skew(rMBb)]*dnu) + Rmb*(skew(wBNb)*(skew(wBNb)*rMBb + vBNb)-Rnb'*gn);
 
 %Gyro
 wimu = nu(4:6) + wbias;

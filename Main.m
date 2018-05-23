@@ -28,7 +28,7 @@ param.VB.sigma      = eye(3)*0.01;      % Noise on VB data (rad)
 % ---- IMU parameters
 param.IMU.acc_sigma = eye(3)*0.01;      % Noise on accelerometer data (m/s^2)
 param.IMU.gyro_sigma = eye(3)*0.01;     % Noise on gyro data (rad/s)
-param.IMU.gyro_bias  = diag([0.4, -0.2, 0.6]);
+param.IMU.gyro_bias  = [0.4, -0.2, 0.6]';
 param.IMU.magn_sigma = eye(3)*0.01;
 % ---- GPS parameters
 param.GPS.sigma      = eye(3)*5;       % Noise on gps data (m)
@@ -78,10 +78,11 @@ end
 Map();
 
 % Get all Data
-% for t = 1:param.tf*param.sensor_sample_rate
-%     data.RAW.All  = GetRawData([data.AUV.X(:,t); zeros(12,1); data.QUAD.X(:,t)], ...
-%                          [data.AUV.dnu(:,t); zeros(6,1); data.QUAD.dnu(:,t)]);
-% end
+data.ALL.raw = zeros(,param.tf*param.sensor_sample_rate);
+for t = 1:param.tf*param.sensor_sample_rate
+    tmp  = GetRawData([data.AUV.raw.X(:,t); data.WAMV.raw.X(:,t); data.QUAD.raw.X(:,t)], ...
+                                    [data.AUV.raw.dnu(:,t); data.WAMV.raw.dnu(:,t); data.QUAD.raw.dnu(:,t)]);
+end
 
 %% KALMAN FILTER THE FUCK OUT OF SHIT
 % for t = 1:N

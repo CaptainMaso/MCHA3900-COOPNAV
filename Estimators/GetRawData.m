@@ -1,21 +1,24 @@
 function Yraw = GetRawData(Xm, dnuM)
-global param
+global param map
 
 monolithicOffset = 12*0; % Offset 0 for AUV
-auv_etanu = Xm(1+monolithicOffset:12+monolithicOffset);
-auv_dnu = dnuM(1+monolithicOffset:6+monolithicOffset);
+auv_etanu   = Xm(1+monolithicOffset:12+monolithicOffset);
+monolithicOffset = 6*0; % Offset 1 for AUV
+auv_dnu     = dnuM(1+monolithicOffset:6+monolithicOffset);
 
 monolithicOffset = 12*1; % Offset 1 for WAMV
-wamv_etanu = Xm(1+monolithicOffset:12+monolithicOffset);
-wamv_dnu = dnuM(1+monolithicOffset:6+monolithicOffset);
+wamv_etanu  = Xm(1+monolithicOffset:12+monolithicOffset);
+monolithicOffset = 6*1; % Offset 1 for WAMV
+wamv_dnu    = dnuM(1+monolithicOffset:6+monolithicOffset);
 
 monolithicOffset = 12*2; % Offset 2 for QUAD
-quad_etanu = Xm(1+monolithicOffset:12+monolithicOffset);
-quad_dnu = dnuM(1+monolithicOffset:6+monolithicOffset);
+quad_etanu  = Xm(1+monolithicOffset:12+monolithicOffset);
+monolithicOffset = 6*2;  % Offset 2 for QUAD
+quad_dnu    = dnuM(1+monolithicOffset:6+monolithicOffset);
 
 % ----------- AUV DATA
 % Gets AUV IMU data
-Y_IMU = GetIMUData([auv_etanu;auv_dnu], param.IMU.gyrobias) + blkdiag(param.IMU.acc_sigma,param.IMU.gyro_sigma,param.IMU.magn_sigma)*randn(9,1);
+Y_IMU = GetIMUData([auv_etanu;auv_dnu], param.IMU.gyro_bias) + blkdiag(param.IMU.acc_sigma,param.IMU.gyro_sigma,param.IMU.magn_sigma)*randn(9,1);
 
 % Gets AUV HAP data
 Y_HAP = GetHAPData([auv_etanu;auv_dnu], wamv_etanu);
@@ -25,13 +28,14 @@ Y_AUV = [Y_IMU;Y_HAP];
 
 % ------------- WAMV DATA
 % Gets WAMV IMU data
-Y_IMU = GetIMUData([wamv_etanu;wamv_dnu], param.IMU.gyrobias) + blkdiag(param.IMU.acc_sigma,param.IMU.gyro_sigma,param.IMU.magn_sigma)*randn(9,1);
+Y_IMU = GetIMUData([wamv_etanu;wamv_dnu], param.IMU.gyro_bias) + blkdiag(param.IMU.acc_sigma,param.IMU.gyro_sigma,param.IMU.magn_sigma)*randn(9,1);
 
 % Gets WAMV GPS data
 Y_GPS = GetGPSData([wamv_etanu;wamv_dnu]) + param.GPS.sigma*randn(3,1);
 
 % Gets VB Data
-Y_VB  = GetVBData([wamv_etanu;wamv_dnu]) + param.VB.sigma*randn(3*param.VB.N,1);
+sigmaprime = repmat({param.VB.sigma},1,map.VB.N);
+Y_VB  = GetVBData([wamv_etanu;wamv_dnu]) + blkdiag(sigmaprime{:})*randn(3*map.VB.N,1);
 
 % Stack and return
 Y_WAMV = [Y_IMU;Y_GPS;Y_VB];
@@ -43,24 +47,28 @@ rWQn    = wamv_etanu(1:3) - quad_etanu(1:3);
 rWQq    = Rnq'*rWQn;
 
 % Gets IMU data
-Y_IMU   = GetIMUData([quad_etanu;quad_dnu], param.IMU.gyrobias) + blkdiag(param.IMU.acc_sigma,param.IMU.gyro_sigma,param.IMU.magn_sigma)*randn(9,1);
+Y_IMU   = GetIMUData([quad_etanu;quad_dnu], param.IMU.gyro_bias) + blkdiag(param.IMU.acc_sigma,param.IMU.gyro_sigma,param.IMU.magn_sigma)*randn(9,1);
 
 % Gets GPS data
-Y_GPS   = GetGPSData([quad_etanu;quad_dnu]) + param.IMU.sigma*randn;
+Y_GPS   = GetGPSData([quad_etanu;quad_dnu]) + param.GPS.sigma*randn(3,1);
 
 % Gets VB Data
 Y_VB    = GetVBData([quad_etanu;quad_dnu]);
 
 vb_wamv = rWQq/norm(rWQq);
+if (norm(rWQq) == 0)
+   vb_wamv = [0;0;0]; 
+end
 
-Y_VB    = [Y_VB;vb_wamv] + param.VB.sigma*randn(3*(param.VB.N+1),1);  % Adds normalised bearing vector from quad to wamv
+sigmaprime = repmat({param.VB.sigma},1,map.VB.N+1);
+Y_VB    = [Y_VB;vb_wamv] + blkdiag(sigmaprime{:})*randn(3*(map.VB.N+1),1);  % Adds normalised bearing vector from quad to wamv
 
 % Gets LPS Data
 Y_LPS   = GetLPSData([quad_etanu;quad_dnu]);
 
 lps_wamv = norm(rWQn);
 
-Y_LPS   = [Y_LPS; lps_wamv] + param.LPS.sigma*randn(param.LPS.N+1,1);     % Adds distance from quad to wamv to LPS data
+Y_LPS   = [Y_LPS; lps_wamv] + param.LPS.sigma*randn(map.LPS.N+1,1);     % Adds distance from quad to wamv to LPS data
 
 % Stack and return
 Y_QUAD = [Y_IMU;Y_GPS;Y_VB;Y_LPS];
