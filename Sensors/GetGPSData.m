@@ -1,4 +1,4 @@
-function y_gps = GetGPSData(in)
+function [y_gps,SR] = GetGPSData(in)
 global param
 %in(1:6) -> eta
 %in(7:12) -> nu
@@ -13,3 +13,5 @@ if (eta(2) > 500); eta(2)=500; elseif (eta(2) < -500); eta(2)=-500; end
 if (eta(1) > 100); eta(3)=100; elseif (eta(3) < -100); eta(3)=-100; end
 
 y_gps = [eta(1);eta(2);eta(3)];
+
+SR = param.GPS.sigma;

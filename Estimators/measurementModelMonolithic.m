@@ -1,4 +1,4 @@
-function Ym = measurementModelMonolithic(Xm, Um)
+function [Ym,SR] = measurementModelMonolithic(Xm, Um)
                     % Assume full 6DOF, unused states should have restoring forces on them
 U_AUV   = Um(1:6);  % Assume fully actuated, underactuated systems should pad desired forces
                     % with zeros
