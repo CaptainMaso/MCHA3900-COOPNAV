@@ -106,124 +106,55 @@ end
 data.ALL.raw = zeros(param.AUV.datalength + ...
                      param.WAMV.datalength + ...
                      param.QUAD.datalength ,param.tf*param.sensor_sample_rate);
-for t = 1:param.tf*param.sensor_sample_rate
+for t = 1:param.tf*param.sensor_sample_rate+1
     data.ALL.raw(:,t)  = GetRawData([data.AUV.raw.X(:,t); data.WAMV.raw.X(:,t); data.QUAD.raw.X(:,t)], ...
                                     [data.AUV.raw.dnu(:,t); data.WAMV.raw.dnu(:,t); data.QUAD.raw.dnu(:,t)]);
 end
 
 %% KALMAN FILTER THE FUCK OUT OF SHIT
-% for t = 1:N
-%    % UKF AUV
-%    
-%    
-%    % UKF WAMV
-%    
-%    
-%    %UKF QUAD
-%    
-%    
-%    
-%    %MERGE
-% end
-clc
-
-
 N = data.AUV.raw.N;
-U = [data.AUV.U;data.WAMV.U;data.QUAD.U];
+U = [data.AUV.U;data.WAMV.U;data.QUAD.U;zeros(5,length(data.QUAD.U))];
+U = [zeros(18,1),U];
 Y = data.ALL.raw;
 
 n = size(data.AUV.raw.X,1) + size(data.WAMV.raw.X,1)+ size(data.QUAD.raw.X,1) + 9; % Length of states
 m = size(U,1);      % Length of inputs
 p = size(Y,1);      % Length of outputs
 
-mu_pri = zeros(n,1);
-S_pri = diag(ones(n,1));
+mup = zeros(n,1);
+SPp = diag(ones(n,1));
+
+muf_mono = zeros(n,N);
 for t = 1:N
-   % UKF
-    u = U(:,t);
+   % AUV MU
+    u = U(1:6,t);
     f =  @(x,u) measurementModelAUV(x,u);
     jointFunc               = @(x,u) augmentIdentityAdapter(f, x, u);
+    [muxy,Syx]              = unscentedTransform(mup, SPp, jointFunc, u);
+    [muf_auv, SPf_auv]       = conditionGaussianOnMarginal(muxy, Syx, Y(1:param.AUV.datalength,t));       
+    offset = param.AUV.datalength;
+   % WAMV MU
+    u = U(7:12,t);
+    f =  @(x,u) measurementModelWAMV(x,u);
+    jointFunc               = @(x,u) augmentIdentityAdapter(f, x, u);
+    [muxy,Syx]              = unscentedTransform(mup, SPp, jointFunc, u);
+    [muf_wamv, SPf_wamv]       = conditionGaussianOnMarginal(muxy, Syx, Y(param.AUV.datalength+1:param.AUV.datalength+param.WAMV.datalength,t));
+    offset = offset + param.WAMV.datalength;
+   %QUAD MU
+    u = U(13:18,t);
+    f =  @(x,u) measurementModelQUAD(x,u);
+    jointFunc               = @(x,u) augmentIdentityAdapter(f, x, u);
+    [muxy,Syx]              = unscentedTransform(mup, SPp, jointFunc, u);
+    [muf_quad, SPf_quad]       = conditionGaussianOnMarginal(muxy, Syx, Y(param.AUV.datalength+param.WAMV.datalength+1:param.AUV.datalength+param.WAMV.datalength+ param.QUAD.datalength,t));
     
-%%%%%%%%%%%%%%%%%%% unscentedTransform.m call %%%%%%%%%%
-
-%     [muxy,Syx]              = unscentedTransform(mu_pri, S_pri, jointFunc);
-    
-%     function [muy,Syy] = unscentedTransform(mux,Sxx,h,c)
-
-%
-% Square Root Unscented Transform of y = h(x) + v
-% where v ~ N(0,R) = N(0,SR.'*SR)
-% using 2*n + 1 sigma points and output constraints y <-- c(y)
-%
-mux = mu_pri; 
-Sxx = S_pri;
-h = jointFunc;
-
-n = length(mux);          	% Length of input vector
-nsigma = 2*n+1;             % Number of sigma points
-
-% Unscented transform parameters
-alpha = 1;
-kappa = 0;
-lambda = alpha^2*(n + kappa) - n;
-gamma = sqrt(n + lambda);
-beta = 2;
-
-% Mean weights
-Wm = [repmat(1/(2*(n+lambda)),1,2*n), lambda/(n+lambda)];
-
-% Covariance weights
-Wc = [repmat(1/(2*(n+lambda)),1,2*n), lambda/(n+lambda) + (1-alpha^2+beta)];
-
-% Generate sigma points
-xsigma = zeros(n,nsigma);   % Input sigma points
-for i = 1:n
-    xsigma(:,i)   = mux + gamma*Sxx(i,:).';
-    xsigma(:,i+n) = mux - gamma*Sxx(i,:).';
-end
-xsigma(:,2*n+1) = mux;
-
-% % Apply constraints
-% if nargin >= 4
-%     for i = 1:nsigma
-%         xsigma(:,i) = c(xsigma(:,i));
-%     end
-% end
-
-% Transform the sigma points through the function
-[temp,SR] = h(xsigma(:,nsigma),u);  	% Use function eval at mean to extract SR and
-ny = length(temp);                      % determine output dimension and
-ysigma = zeros(ny,nsigma);              % initialise output sigma points
-ysigma(:,nsigma) = temp;
-for i = 1:nsigma-1
-    [ysigma(:,i),~] = h(xsigma(:,i),u);
-end
-
-% Unscented mean
-muy = sum(Wm.*ysigma,2);
-
-% Compute conditional mean and sqrt covariance
-dysigma = [realsqrt(Wc).*(ysigma - muy), SR];
-R = triu(qr(dysigma.',0));
-Syy = R(1:ny,:);
-Syy = sign(diag(Syy)).*Syy; % Choose factor with positive diagonal (QR is not unique)
-%%%%%%%%%%%%%%%%%%% unscentedTransform.m returns %%%%%%%%%%
-muxy = muy;
-Syx = Syy;
-
-% function [mu_next, S_next] = UKF_PU(mu_pri, S_pri, U, processModel)
-    [mu_post, S_post]       = conditionGaussianOnMarginal(muxy, Syx, Y(:,t));
-%     [mu_next, S_next] = UKF_PU(mu_pri, S_pri, U, processModelMonolithic);
-    processFunc  = @(x,u) processModelMonolithic(mu_pri, u);
-    [mu_next, S_next] = unscentedTransform(mu_pri, S_pri, processFunc,u);
-   % UKF WAMV
+    SPf_mono = inv(inv(SPf_auv) + inv(SPf_wamv) + inv(SPf_quad) - 2*inv(SPp));
+    muf_mono(:,t) = SPf_mono*(SPf_auv\muf_auv + SPf_wamv\muf_wamv + SPf_quad\muf_quad - 2*inv(SPp)*mup);
    
+    % UKF_PU   
+    u = U(:,t+1);
+    processFunc  = @(x,u) processModelMonolithic(x, u);
+    [mu_next, S_next] = unscentedTransform(muf_mono(:,t), SPf_mono, processFunc, u);
    
-   %UKF QUAD
-   
-   
-   
-   %MERGE
 end
 
 %% PLOT ALL THE THINGS (For now)
@@ -232,6 +163,9 @@ end
 f = figure(1);
 columns = sum(param.enabled);
 rows = 6;
+data.AUV.post_data = muf_mono(1:12,:);
+data.WAMV.post_data = muf_mono(13:24,:);
+data.QUAD.post_data = muf_mono(25:36,:);
 
 % AUV ETA data
 if (param.enabled(1))
@@ -241,7 +175,7 @@ if (param.enabled(1))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + 1);
-        plot(data.AUV.raw.t, data.AUV.raw.X(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        plot(data.AUV.raw.t, data.AUV.raw.X(row,:)*scales(row),data.AUV.raw.t, data.AUV.post_data(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
         grid on;
         t = titles(row);
         title(t{:}, 'Interpreter', 'latex');
@@ -259,7 +193,7 @@ if (param.enabled(2))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + sum(param.enabled(1:2)));
-        plot(data.WAMV.raw.t, data.WAMV.raw.X(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        plot(data.WAMV.raw.t, data.WAMV.raw.X(row,:)*scales(row),data.WAMV.raw.t, data.WAMV.post_data(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
         grid on;
         t = titles(row);
         title(t{:}, 'Interpreter', 'latex');
@@ -276,7 +210,7 @@ if (param.enabled(3))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + sum(param.enabled));
-        plot(data.QUAD.raw.t, data.QUAD.raw.X(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        plot(data.QUAD.raw.t, data.QUAD.raw.X(row,:)*scales(row),data.QUAD.raw.t, data.QUAD.post_data(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
         grid on;
         t = titles(row);
         title(t{:}, 'Interpreter', 'latex');
@@ -295,7 +229,7 @@ if (param.enabled(1))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + 1);
-        plot(data.AUV.raw.t, data.AUV.raw.X(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        plot(data.AUV.raw.t, data.AUV.raw.X(row + 6,:)*scales(row),data.AUV.raw.t, data.AUV.post_data(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
         grid on;
         t = titles(row);
         title(t{:}, 'Interpreter', 'latex');
@@ -313,7 +247,7 @@ if (param.enabled(2))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + sum(param.enabled(1:2)));
-        plot(data.WAMV.raw.t, data.WAMV.raw.X(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        plot(data.WAMV.raw.t, data.WAMV.raw.X(row + 6,:)*scales(row),data.WAMV.raw.t, data.WAMV.post_data(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
         grid on;
         t = titles(row);
         title(t{:}, 'Interpreter', 'latex');
@@ -330,7 +264,7 @@ if (param.enabled(3))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + sum(param.enabled));
-        plot(data.QUAD.raw.t, data.QUAD.raw.X(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        plot(data.QUAD.raw.t, data.QUAD.raw.X(row + 6,:)*scales(row),data.QUAD.raw.t, data.QUAD.post_data(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
         grid on;
         t = titles(row);
         title(t{:}, 'Interpreter', 'latex');

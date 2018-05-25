@@ -1,4 +1,4 @@
-function [muy,Syy] = unscentedTransform(mux,Sxx,h,c)
+function [muy,Syy] = unscentedTransform(mux,Sxx,h,u)
 
 %
 % Square Root Unscented Transform of y = h(x) + v
@@ -30,20 +30,20 @@ for i = 1:n
 end
 xsigma(:,2*n+1) = mux;
 
-% Apply constraints
-if nargin >= 4
-    for i = 1:nsigma
-        xsigma(:,i) = c(xsigma(:,i));
-    end
-end
+% % Apply constraints
+% if nargin >= 4
+%     for i = 1:nsigma
+%         xsigma(:,i) = c(xsigma(:,i));
+%     end
+% end
 
 % Transform the sigma points through the function
-[temp,SR] = h(xsigma(:,nsigma));  	% Use function eval at mean to extract SR and
+[temp,SR] = h(xsigma(:,nsigma),u);  	% Use function eval at mean to extract SR and
 ny = length(temp);                      % determine output dimension and
 ysigma = zeros(ny,nsigma);              % initialise output sigma points
 ysigma(:,nsigma) = temp;
 for i = 1:nsigma-1
-    [ysigma(:,i),~] = h(xsigma(:,i));
+    [ysigma(:,i),~] = h(xsigma(:,i),u);
 end
 
 % Unscented mean

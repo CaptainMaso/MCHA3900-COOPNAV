@@ -1,14 +1,14 @@
 function [Y_QUAD, SR_QUAD] = measurementModelQUAD(Xm, U_QUAD)
-
+global param
 monolithicOffset = 12*2; % Offset 2 for QUAD
 quad_etanu = Xm(1+monolithicOffset:12+monolithicOffset);
-quad_dnu = WAMV_detanu([U_QUAD;quad_etanu]);
+quad_dnu = quad_detanu([U_QUAD;quad_etanu]);
 
 monolithicOffset = 12*1; % Offset 1 for WAMV
 wamv_etanu = Xm(1+monolithicOffset:12+monolithicOffset);
 
 monolithicOffset = 12*3 + 3*2; % Offset 3 for biases, 2 for QUAD
-quad_gyrobias = Xm(1+monolithicOffset:3+monolithicOffset)
+quad_gyrobias = Xm(1+monolithicOffset:3+monolithicOffset);
 
 % Get vector from QUAD to WAMV in b (rWQb)
 Rnq     = eulerRotation(quad_etanu(4:6));
