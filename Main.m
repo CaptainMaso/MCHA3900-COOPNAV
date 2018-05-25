@@ -110,7 +110,7 @@ if (param.enabled(3))
     clearvars -except data param map
 end
 %% Simulate Sensor Data
-data.ALL.U     = [data.AUV.U; data.WAMV.U, data.QUAD.U];
+data.ALL.U     = [data.AUV.U; data.WAMV.U; data.QUAD.U];
 % Get all Data
 data.ALL.Y = zeros(param.AUV.datalength + ...
                      param.WAMV.datalength + ...
@@ -143,6 +143,7 @@ SQp(:,:,1)   = SQ0;
 
 for t = 1:param.tf*param.sensor_sample_rate
    % Measurement update
+   
 end
 
 %% PLOT ALL THE THINGS (For now)
