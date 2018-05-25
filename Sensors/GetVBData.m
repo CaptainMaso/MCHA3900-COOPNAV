@@ -1,5 +1,5 @@
-function y_VB = GetVBData(in)
-global map
+function [y_VB, SR] = GetVBData(in)
+global map param
 
 etaBNn = in(1:6);
 rBNn = etaBNn(1:3);
@@ -15,3 +15,6 @@ for ii = 1:map.VB.N
 end
 
 y_VB = y_VB(:);
+
+sigmaprime = repmat({param.VB.sigma},1,map.VB.N);
+SR = blkdiag(sigmaprime{:});

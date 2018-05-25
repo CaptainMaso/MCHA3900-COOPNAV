@@ -1,4 +1,4 @@
-function y_imu = GetIMUData(in, wbias)
+function [y_imu,SR] = GetIMUData(in, wbias)
 global param
 %in(1:6) -> eta
 %in(7:12) -> nu
@@ -28,4 +28,4 @@ m = [1;0;0];                         %not sure if this is correct
 mimu = (Rnb')*m;
 
 y_imu = [aimu;wimu;mimu];
-
+SR    = blkdiag(param.IMU.acc_sigma,param.IMU.gyro_sigma,param.IMU.magn_sigma);

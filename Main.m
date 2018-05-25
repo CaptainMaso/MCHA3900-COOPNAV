@@ -47,6 +47,9 @@ param.HAP.datalength = 3;
 % --- Simulation Parameters
 param.tf = 50;
 
+% Get Map data
+Map();
+
 %% Get Vehicle Data
 %% -- AUV data
 if (param.enabled(1))
@@ -97,32 +100,20 @@ if (param.enabled(3))
     clearvars -except data param map
 end
 %% Simulate Sensor Data
-% Get Map data
-Map();
-
 % Get all Data
 data.ALL.raw = zeros(param.AUV.datalength + ...
                      param.WAMV.datalength + ...
                      param.QUAD.datalength ,param.tf*param.sensor_sample_rate);
 for t = 1:param.tf*param.sensor_sample_rate
-    data.ALL.raw(:,t)  = GetRawData([data.AUV.raw.X(:,t); data.WAMV.raw.X(:,t); data.QUAD.raw.X(:,t)], ...
+    [data.ALL.raw(:,t),SR]  = GetRawData([data.AUV.raw.X(:,t); data.WAMV.raw.X(:,t); data.QUAD.raw.X(:,t)], ...
                                     [data.AUV.raw.dnu(:,t); data.WAMV.raw.dnu(:,t); data.QUAD.raw.dnu(:,t)]);
 end
 
 %% KALMAN FILTER THE FUCK OUT OF SHIT
-% for t = 1:N
-%    % UKF AUV
-%    
-%    
-%    % UKF WAMV
-%    
-%    
-%    %UKF QUAD
-%    
-%    
-%    
-%    %MERGE
-% end
+for t = 1:param.tf*param.sensor_sample_rate
+   % UKF Monolithic
+   
+end
 % N = data.AUV.raw.N;
 % U = data.AUV.U;
 % Y = 1;
