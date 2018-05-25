@@ -1,4 +1,4 @@
-function Xm_next = processModelMonolithic(Xm, Um)
+function [Xm_next,Xm_SR] = processModelMonolithic(Xm, Um)
 
 X_AUV   = Xm(1:12); % Assume full 6DOF, unused states should have restoring forces on them
 U_AUV   = Um(1:6);  % Assume fully actuated, underactuated systems should pad desired forces
@@ -24,3 +24,4 @@ dX_QUAD = quad_detanu([U_QUAD; X_QUAD]);
 dXm     = [dX_AUV;dX_WAMV;dX_QUAD;zeros(size(X_bias,1),1)];
 
 Xm_next = eye(36 + size(X_bias,1)) + (1/param.sensor_sample_rate)*dXm;
+Xm_SR = eye(36);
