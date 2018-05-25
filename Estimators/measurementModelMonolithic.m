@@ -6,8 +6,9 @@ U_WAMV  = Um(7:12);
 
 U_QUAD  = Um(13:18);
 
-Y_AUV   = measurementModelAUV(Xm, U_AUV);
-Y_WAMV  = measurementModelWAMV(Xm, U_WAMV);
-Y_QUAD  = measurementModelQUAD(Xm, U_QUAD);
+[Y_AUV, SR_AUV]   = measurementModelAUV(Xm, U_AUV);
+[Y_WAMV, SR_WAMV] = measurementModelWAMV(Xm, U_WAMV);
+[Y_QUAD, SR_QUAD]  = measurementModelQUAD(Xm, U_QUAD);
 
 Ym = [Y_AUV;Y_WAMV;Y_QUAD];
+SR = blkdiag(SR_AUV, SR_WAMV, SR_QUAD);

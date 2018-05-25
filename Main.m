@@ -48,6 +48,16 @@ param.HAP.datalength = 3;
 % --- Simulation Parameters
 param.tf = 50;
 
+% --- Vehicle Uncertainties
+param.AUV.SQeta = diag([1 1 1]);
+param.AUV.SQnu  = diag([0.5 0.5 0.5]);
+
+param.WAMV.SQeta = diag([1 1 1]);
+param.WAMV.SQnu  = diag([0.5 0.5 0.5]);
+
+param.QUAD.SQeta = diag([1 1 1]);
+param.QUAD.SQnu  = diag([0.5 0.5 0.5]);
+
 % Get Map data
 Map();
 %% Get Vehicle Data
@@ -100,130 +110,39 @@ if (param.enabled(3))
     clearvars -except data param map
 end
 %% Simulate Sensor Data
-
-
+data.ALL.U     = [data.AUV.U; data.WAMV.U, data.QUAD.U];
 % Get all Data
-data.ALL.raw = zeros(param.AUV.datalength + ...
+data.ALL.Y = zeros(param.AUV.datalength + ...
                      param.WAMV.datalength + ...
                      param.QUAD.datalength ,param.tf*param.sensor_sample_rate);
 for t = 1:param.tf*param.sensor_sample_rate
-    data.ALL.raw(:,t)  = GetRawData([data.AUV.raw.X(:,t); data.WAMV.raw.X(:,t); data.QUAD.raw.X(:,t)], ...
+    data.ALL.Y(:,t)  = GetRawData([data.AUV.raw.X(:,t); data.WAMV.raw.X(:,t); data.QUAD.raw.X(:,t)], ...
                                     [data.AUV.raw.dnu(:,t); data.WAMV.raw.dnu(:,t); data.QUAD.raw.dnu(:,t)]);
 end
 
 %% KALMAN FILTER THE FUCK OUT OF SHIT
-% for t = 1:N
-%    % UKF AUV
-%    
-%    
-%    % UKF WAMV
-%    
-%    
-%    %UKF QUAD
-%    
-%    
-%    
-%    %MERGE
-% end
-clc
+N = size(data.ALL.Y,2);     % Length of data
+n = size(data.AUV.raw.X,1) + size(data.WAMV.raw.X,1)+ size(data.QUAD.raw.X,1) + 9;    % Size of state vector
+m = size(data.ALL.U,1);     % Size of input vector (Required to be n-n_biases)
+p = size(data.ALL.Y,1);     % Size of output vector
 
+% Create initial variances
+X0 = zeros(n,1);
+SQ0 = 5*blkdiag(param.AUV.SQeta, param.AUV.SQnu, param.WAMV.SQeta, param.WAMV.SQnu, param.QUAD.SQeta, param.QUAD.SQnu); 
 
-N = data.AUV.raw.N;
-U = [data.AUV.U;data.WAMV.U;data.QUAD.U];
-Y = data.ALL.raw;
+% Initialise space for estimated means and covariances
+mup = zeros(n, N+1);
+muf = zeros(n, N);
 
-n = size(data.AUV.raw.X,1) + size(data.WAMV.raw.X,1)+ size(data.QUAD.raw.X,1) + 9; % Length of states
-m = size(U,1);      % Length of inputs
-p = size(Y,1);      % Length of outputs
+SQp  = zeros(n,n,N+1);
+SQf  = zeros(n,n,N+1);
 
-mu_pri = zeros(n,1);
-S_pri = diag(ones(n,1));
-for t = 1:N
-   % UKF
-    u = U(:,t);
-    f =  @(x,u) measurementModelAUV(x,u);
-    jointFunc               = @(x,u) augmentIdentityAdapter(f, x, u);
-    
-%%%%%%%%%%%%%%%%%%% unscentedTransform.m call %%%%%%%%%%
+% Set initial values
+mup(:,1)    = X0;
+SQp(:,:,1)   = SQ0;
 
-%     [muxy,Syx]              = unscentedTransform(mu_pri, S_pri, jointFunc);
-    
-%     function [muy,Syy] = unscentedTransform(mux,Sxx,h,c)
-
-%
-% Square Root Unscented Transform of y = h(x) + v
-% where v ~ N(0,R) = N(0,SR.'*SR)
-% using 2*n + 1 sigma points and output constraints y <-- c(y)
-%
-mux = mu_pri; 
-Sxx = S_pri;
-h = jointFunc;
-
-n = length(mux);          	% Length of input vector
-nsigma = 2*n+1;             % Number of sigma points
-
-% Unscented transform parameters
-alpha = 1;
-kappa = 0;
-lambda = alpha^2*(n + kappa) - n;
-gamma = sqrt(n + lambda);
-beta = 2;
-
-% Mean weights
-Wm = [repmat(1/(2*(n+lambda)),1,2*n), lambda/(n+lambda)];
-
-% Covariance weights
-Wc = [repmat(1/(2*(n+lambda)),1,2*n), lambda/(n+lambda) + (1-alpha^2+beta)];
-
-% Generate sigma points
-xsigma = zeros(n,nsigma);   % Input sigma points
-for i = 1:n
-    xsigma(:,i)   = mux + gamma*Sxx(i,:).';
-    xsigma(:,i+n) = mux - gamma*Sxx(i,:).';
-end
-xsigma(:,2*n+1) = mux;
-
-% % Apply constraints
-% if nargin >= 4
-%     for i = 1:nsigma
-%         xsigma(:,i) = c(xsigma(:,i));
-%     end
-% end
-
-% Transform the sigma points through the function
-[temp,SR] = h(xsigma(:,nsigma),u);  	% Use function eval at mean to extract SR and
-ny = length(temp);                      % determine output dimension and
-ysigma = zeros(ny,nsigma);              % initialise output sigma points
-ysigma(:,nsigma) = temp;
-for i = 1:nsigma-1
-    [ysigma(:,i),~] = h(xsigma(:,i),u);
-end
-
-% Unscented mean
-muy = sum(Wm.*ysigma,2);
-
-% Compute conditional mean and sqrt covariance
-dysigma = [realsqrt(Wc).*(ysigma - muy), SR];
-R = triu(qr(dysigma.',0));
-Syy = R(1:ny,:);
-Syy = sign(diag(Syy)).*Syy; % Choose factor with positive diagonal (QR is not unique)
-%%%%%%%%%%%%%%%%%%% unscentedTransform.m returns %%%%%%%%%%
-muxy = muy;
-Syx = Syy;
-
-% function [mu_next, S_next] = UKF_PU(mu_pri, S_pri, U, processModel)
-    [mu_post, S_post]       = conditionGaussianOnMarginal(muxy, Syx, Y(:,t));
-%     [mu_next, S_next] = UKF_PU(mu_pri, S_pri, U, processModelMonolithic);
-    processFunc  = @(x,u) processModelMonolithic(mu_pri, u);
-    [mu_next, S_next] = unscentedTransform(mu_pri, S_pri, processFunc,u);
-   % UKF WAMV
-   
-   
-   %UKF QUAD
-   
-   
-   
-   %MERGE
+for t = 1:param.tf*param.sensor_sample_rate
+   % Measurement update
 end
 
 %% PLOT ALL THE THINGS (For now)
