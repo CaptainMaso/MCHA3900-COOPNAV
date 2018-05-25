@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.71"
+    ComputedModelVersion    "1.73"
     NumModelReferences	    0
     NumTestPointedSignals   0
     NumProvidedFunctions    0
@@ -56,7 +56,7 @@ Model {
       $ObjectID		      2
       $ClassName	      "Simulink.WindowInfo"
       IsActive		      [1]
-      Location		      [762.0, 0.0, 781.0, 830.0]
+      Location		      [-7.0, -1087.0, 1935.0, 1055.0]
       Object {
 	$PropName		"ModelBrowserInfo"
 	$ObjectID		3
@@ -80,9 +80,9 @@ Model {
 	IsActive		[1]
 	ViewObjType		"SimulinkTopLevel"
 	LoadSaveID		"0"
-	Extents			[913.0, 823.0]
-	ZoomFactor		[0.99999999999999978]
-	Offset			[79.111844660514365, -14.255880071948999]
+	Extents			[2824.0, 1334.0]
+	ZoomFactor		[1.25]
+	Offset			[10.713431962101481, 70.496500880432222]
       }
       Object {
 	$PropName		"DockComponentsInfo"
@@ -95,18 +95,18 @@ Model {
 	UserData		""
 	Floating		[0]
 	DockPosition		"Right"
-	Width			[512]
-	Height			[384]
+	Width			[426]
+	Height			[320]
       }
       WindowState	      "AAAA/wAAAAD9AAAAAgAAAAAAAAC9AAAB+PwCAAAAA/sAAAAWAEQAbwBjAGsAVwBpAGQAZwBlAHQAMwEAAAAxAAAB+AAAA"
       "AAAAAAA+wAAABYARABvAGMAawBXAGkAZABnAGUAdAA0AAAAAAD/////AAAAAAAAAAD7AAAAUgBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0Ac"
-      "ABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQAAAAAAP////8AAAB4AP///wAAAAEAAAAAAAAAAPwCA"
+      "ABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQAAAAAAP////8AAACSAP///wAAAAEAAAAAAAAAAPwCA"
       "AAAAfsAAABUAEcATABVAEUAMgA6AFAAcgBvAHAAZQByAHQAeQBJAG4AcwBwAGUAYwB0AG8AcgAvAFAAcgBvAHAAZQByAHQAeQAgAEkAbgBzAHAAZ"
-      "QBjAHQAbwByAAAAAAD/////AAAANAD///8AAAO+AAADfAAAAAEAAAACAAAAAQAAAAL8AAAAAQAAAAIAAAAP/////wAAAAAA/////wAAAAAAAAAA/"
+      "QBjAHQAbwByAAAAAAD/////AAAAPQD///8AAAtAAAAFhAAAAAEAAAACAAAAAQAAAAL8AAAAAQAAAAIAAAAP/////wAAAAAA/////wAAAAAAAAAA/"
       "////wEAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/"
-      "////wEAAACR/////wAAAAAAAAAA/////wEAAAEE/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAGV/////wAAAAAAAAAA/"
-      "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAOG/////wAAAAAAAAAA/"
-      "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA"
+      "////wEAAACp/////wAAAAAAAAAA/////wEAAAEu/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAHX/////wAAAAAAAAAA/"
+      "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAR7/////wAAAAAAAAAA/"
+      "////wEAAAS8/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA"
     }
   }
   HideAutomaticNames	  on
@@ -114,13 +114,13 @@ Model {
   Creator		  "tristan"
   UpdateHistory		  "UpdateHistoryNever"
   ModifiedByFormat	  "%<Auto>"
-  LastModifiedBy	  "matta"
+  LastModifiedBy	  "masom"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Wed May 23 20:44:27 2018"
-  RTWModifiedTimeStamp	  449008994
-  ModelVersionFormat	  "1.%<AutoIncrement:71>"
-  SampleTimeColors	  off
-  SampleTimeAnnotations	  off
+  LastModifiedDate	  "Fri May 25 15:01:47 2018"
+  RTWModifiedTimeStamp	  449160922
+  ModelVersionFormat	  "1.%<AutoIncrement:73>"
+  SampleTimeColors	  on
+  SampleTimeAnnotations	  on
   LibraryLinkDisplay	  "none"
   WideLines		  off
   ShowLineDimensions	  on
@@ -1818,7 +1818,7 @@ Model {
   }
   System {
     Name		    "WAMVmodel"
-    Location		    [762, 0, 1543, 830]
+    Location		    [-7, -1087, 1928, -32]
     Open		    on
     PortBlocksUseCompactNotation off
     SetDomainSpec	    off
@@ -1833,9 +1833,9 @@ Model {
     TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
     TiledPageScale	    1
     ShowPageBoundaries	    off
-    ZoomFactor		    "100"
+    ZoomFactor		    "125"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "90"
+    SIDHighWatermark	    "93"
     Block {
       BlockType		      MATLABFcn
       Name		      "CTRL"
@@ -1846,6 +1846,14 @@ Model {
       BlockMirror	      on
       MATLABFcn		      "wamv_CTRL"
       OutputDimensions	      "3"
+    }
+    Block {
+      BlockType		      Constant
+      Name		      "Constant"
+      SID		      "92"
+      Position		      [305, 675, 340, 705]
+      ZOrder		      291
+      Value		      "[0;0;0]"
     }
     Block {
       BlockType		      Demux
@@ -2101,6 +2109,17 @@ Model {
       DisplayOption	      "bar"
     }
     Block {
+      BlockType		      Mux
+      Name		      "Mux5"
+      SID		      "91"
+      Ports		      [2, 1]
+      Position		      [360, 637, 365, 708]
+      ZOrder		      290
+      ShowName		      off
+      Inputs		      "2"
+      DisplayOption	      "bar"
+    }
+    Block {
       BlockType		      Constant
       Name		      "Reference etap"
       SID		      "20"
@@ -2260,7 +2279,7 @@ Model {
       "ne','Visible','on')}},'UserDefinedChannelNames',{{}},'NumLines',0,'LineNames',{{[]}},'ShowContent',true,'Placeme"
       "nt',1),'DisplayLayoutDimensions',[3 1]),extmgr.Configuration('Tools','Plot Navigation',true,'OnceAtStop',false,'"
       "PreviousAutoscale','XY'),extmgr.Configuration('Tools','Measurements',true,'Version','2018a')),'Version','2018a',"
-      "'Location',[1162.6 84.6 1517.8 876.6],'VisibleAtModelOpen','on')"
+      "'Location',[392.333333333333 209 747.666666666667 1001])"
       NumInputPorts	      "3"
       Floating		      off
     }
@@ -2370,6 +2389,18 @@ Model {
       OutputSizes	      "1"
     }
     Block {
+      BlockType		      Selector
+      Name		      "Selector1"
+      SID		      "93"
+      Ports		      [1, 1]
+      Position		      [445, 648, 480, 702]
+      ZOrder		      292
+      InputPortWidth	      "6"
+      IndexOptions	      "Index vector (dialog)"
+      Indices		      "[1 2 4 5 6 3]"
+      OutputSizes	      "1"
+    }
+    Block {
       BlockType		      Sin
       Name		      "Sine Wave"
       SID		      "85"
@@ -2444,7 +2475,7 @@ Model {
       Name		      "To Workspace1"
       SID		      "72"
       Ports		      [1]
-      Position		      [550, 640, 610, 670]
+      Position		      [555, 660, 615, 690]
       ZOrder		      31
       VariableName	      "WAMV_U"
       MaxDataPoints	      "inf"
@@ -2465,7 +2496,7 @@ Model {
       BlockType		      ZeroOrderHold
       Name		      "Zero-Order\nHold1"
       SID		      "74"
-      Position		      [450, 640, 485, 670]
+      Position		      [305, 640, 340, 670]
       ZOrder		      32
       SampleTime	      "1/param.sensor_sample_rate"
     }
@@ -2579,7 +2610,6 @@ Model {
       Points		      [-60, 0]
       Branch {
 	ZOrder			269
-	Points			[0, -200]
 	DstBlock		"Interpreted MATLAB\nFunction1"
 	DstPort			1
       }
@@ -2958,10 +2988,10 @@ Model {
       DstPort		      2
     }
     Line {
-      ZOrder		      256
+      ZOrder		      335
       SrcBlock		      "Zero-Order\nHold1"
       SrcPort		      1
-      DstBlock		      "To Workspace1"
+      DstBlock		      "Mux5"
       DstPort		      1
     }
     Line {
@@ -3040,6 +3070,27 @@ Model {
       DstBlock		      "Sum1"
       DstPort		      1
     }
+    Line {
+      ZOrder		      336
+      SrcBlock		      "Constant"
+      SrcPort		      1
+      DstBlock		      "Mux5"
+      DstPort		      2
+    }
+    Line {
+      ZOrder		      337
+      SrcBlock		      "Mux5"
+      SrcPort		      1
+      DstBlock		      "Selector1"
+      DstPort		      1
+    }
+    Line {
+      ZOrder		      338
+      SrcBlock		      "Selector1"
+      SrcPort		      1
+      DstBlock		      "To Workspace1"
+      DstPort		      1
+    }
     Annotation {
       SID		      "42"
       Name		      "Control system"
@@ -3053,7 +3104,7 @@ Model {
       BackgroundColor	      "[0.956863, 0.980392, 0.921569]"
       DropShadow	      on
       AnnotationType	      "area_annotation"
-      ZOrder		      238
+      ZOrder		      280
       FontSize		      12
     }
     Annotation {
@@ -3069,7 +3120,7 @@ Model {
       BackgroundColor	      "[0.996078, 0.968627, 0.905882]"
       DropShadow	      on
       AnnotationType	      "area_annotation"
-      ZOrder		      237
+      ZOrder		      279
       FontSize		      12
     }
   }

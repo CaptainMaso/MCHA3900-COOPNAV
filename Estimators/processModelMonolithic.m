@@ -24,4 +24,4 @@ dX_QUAD = quad_detanu([U_QUAD; X_QUAD]);
 dXm     = [dX_AUV;dX_WAMV;dX_QUAD;zeros(size(X_bias,1),1)];
 
 Xm_next = ones(36 + size(X_bias,1),1) + (1/param.sensor_sample_rate)*dXm;
-Xm_SR = eye(45);
+Xm_SR   = blkdiag(param.AUV.SQeta, param.AUV.SQnu, param.WAMV.SQeta, param.WAMV.SQnu, param.QUAD.SQeta, param.QUAD.SQnu);
