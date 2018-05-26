@@ -120,8 +120,10 @@ data.ALL.N = data.AUV.raw.N;
 data.t = data.AUV.t;
 %% Simulate Sensor Data
 data.ALL.U     = [data.AUV.U; data.WAMV.U; data.QUAD.U];
+
+
 % Get all Data
-data.ALL.Y = zeros(param.AUV.datalength + ...
+data.ALL.raw = zeros(param.AUV.datalength + ...
                      param.WAMV.datalength + ...
                      param.QUAD.datalength ,param.tf*param.sensor_sample_rate);
 
