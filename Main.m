@@ -49,14 +49,17 @@ param.HAP.datalength = 3;
 param.tf = 50;
 
 % --- Vehicle Uncertainties
-param.AUV.SQeta = diag([1 1 1]);
-param.AUV.SQnu  = diag([0.5 0.5 0.5]);
+param.AUV.SQeta = diag([1 1 1, deg2rad([10 10 10])]);
+param.AUV.SQnu  = diag([0.5 0.5 0.5, deg2rad([5 5 5])]);
 
-param.WAMV.SQeta = diag([1 1 1]);
-param.WAMV.SQnu  = diag([0.5 0.5 0.5]);
+param.WAMV.SQeta = diag([1 1 1, deg2rad([10 10 10])]);
+param.WAMV.SQnu  = diag([0.5 0.5 0.5, deg2rad([5 5 5])]);
 
-param.QUAD.SQeta = diag([1 1 1]);
-param.QUAD.SQnu  = diag([0.5 0.5 0.5]);
+param.QUAD.SQeta = diag([1 1 1, deg2rad([10 10 10])]);
+param.QUAD.SQnu  = diag([0.5 0.5 0.5, deg2rad([5 5 5])]);
+
+param.SQbias     = diag(deg2rad([1 1 1]));
+param.SQbias0     = diag(deg2rad([20 20 20]));
 
 % Get Map data
 Map();
@@ -65,7 +68,7 @@ Map();
 if (param.enabled(1))
     AUV();
 
-    data.AUV.raw.t      = AUV_states.Time';
+    data.AUV.t          = AUV_states.Time';
     data.AUV.raw.N      = length(data.AUV.raw.t);
     data.AUV.raw.X      = AUV_states.Data(:, 1:12)';
     data.AUV.raw.dnu    = AUV_states.Data(:, 13:18)';
@@ -75,13 +78,14 @@ if (param.enabled(1))
                            param.HAP.datalength;
     
     clearvars -except data param map
+    disp('Finished AUV SIM');
 end
 
 %% -- WAMV data
 if (param.enabled(2))
     WAMV();
 
-    data.WAMV.raw.t     = WAMV_states.Time';
+    data.WAMV.t         = WAMV_states.Time';
     data.WAMV.raw.N     = length(data.WAMV.raw.t);
     data.WAMV.raw.X     = WAMV_states.Data(:, 1:12)';
     data.WAMV.raw.dnu   = WAMV_states.Data(:, 13:18)';
@@ -92,11 +96,12 @@ if (param.enabled(2))
                             param.VB.datalength * map.VB.N;
 
     clearvars -except data param map
+    disp('Finished WAMV SIM');
 end
 % -- QUAD data
 if (param.enabled(3))
     Quadrotor();
-    data.QUAD.raw.t     = QUAD_states.Time';
+    data.QUAD.t         = QUAD_states.Time';
     data.QUAD.raw.N     = length(data.QUAD.raw.t);
     data.QUAD.raw.X     = QUAD_states.Data(:, 1:12)';
     data.QUAD.raw.dnu   = QUAD_states.Data(:, 13:18)';
@@ -108,44 +113,75 @@ if (param.enabled(3))
                             param.LPS.datalength*(map.LPS.N+1);
 
     clearvars -except data param map
+    disp('Finished QUAD SIM');
 end
+assert(data.AUV.raw.N == data.WAMV.raw.N && data.AUV.raw.N == data.QUAD.raw.N, 'State trajectories must be same length');
+data.ALL.N = data.AUV.raw.N;
+data.t = data.AUV.t;
 %% Simulate Sensor Data
 data.ALL.U     = [data.AUV.U; data.WAMV.U; data.QUAD.U];
 % Get all Data
 data.ALL.Y = zeros(param.AUV.datalength + ...
                      param.WAMV.datalength + ...
                      param.QUAD.datalength ,param.tf*param.sensor_sample_rate);
-for t = 1:param.tf*param.sensor_sample_rate
+
+dt = zeros(30,1);                 
+for t = 1:data.ALL.N
+    dtt = tic;
     data.ALL.Y(:,t)  = GetRawData([data.AUV.raw.X(:,t); data.WAMV.raw.X(:,t); data.QUAD.raw.X(:,t)], ...
                                     [data.AUV.raw.dnu(:,t); data.WAMV.raw.dnu(:,t); data.QUAD.raw.dnu(:,t)]);
+   dt(1:29) = dt(2:30);
+   dt(30) = toc(dtt);
+   ttf = degrees2dm(sum(dt)/30*(data.ALL.N - t)/60);
+   disp(['ETA data gen: ' num2str(ttf(1), '%.0f') 'm ' num2str(ttf(2), '%.2f') 's'])
 end
 
 %% KALMAN FILTER THE FUCK OUT OF SHIT
 N = size(data.ALL.Y,2);     % Length of data
-n = size(data.AUV.raw.X,1) + size(data.WAMV.raw.X,1)+ size(data.QUAD.raw.X,1) + 9;    % Size of state vector
+n = size(data.AUV.raw.X,1) + size(data.WAMV.raw.X,1) + size(data.QUAD.raw.X,1) + 9;    % Size of state vector
 m = size(data.ALL.U,1);     % Size of input vector (Required to be n-n_biases)
 p = size(data.ALL.Y,1);     % Size of output vector
 
 % Create initial variances
 X0 = zeros(n,1);
-SQ0 = 5*blkdiag(param.AUV.SQeta, param.AUV.SQnu, param.WAMV.SQeta, param.WAMV.SQnu, param.QUAD.SQeta, param.QUAD.SQnu); 
+SQ0 = 5*blkdiag(param.AUV.SQeta, param.AUV.SQnu, param.WAMV.SQeta, param.WAMV.SQnu, param.QUAD.SQeta, param.QUAD.SQnu, ...
+                param.SQbias0, param.SQbias0, param.SQbias0); 
 
 % Initialise space for estimated means and covariances
-mup = zeros(n, N+1);
-muf = zeros(n, N);
+mup = zeros(n, N+1); % Prior and Posterior states (mup(:,t) = prior, mup(:,t+1) = posterior)
+muf = zeros(n, N);   % Filtered states
 
-SQp  = zeros(n,n,N+1);
-SQf  = zeros(n,n,N+1);
+SPp  = zeros(n,n,N+1);  % Prior and Posterior Squareroot Covariances
+SPf  = zeros(n,n,N+1);  % Filtered Covariances
 
 % Set initial values
 mup(:,1)    = X0;
-SQp(:,:,1)   = SQ0;
+SPp(:,:,1)   = SQ0;
 
-for t = 1:param.tf*param.sensor_sample_rate
+U = [zeros(m,1), data.ALL.U];
+
+for t = 1:data.ALL.N
+    dtt = tic;
+    
    % Measurement update
+   g = @(x,u) measurementModelMonolithic(x,u);
+   [muf(:,t), SPf(:,:,t)]     = UKF_MU(data.ALL.Y(:,t), mup(:,t), SPp(:,:,t), U(:,t), g);
    
+   % Process Update
+   f = @(x,u) processModelMonolithic(x,u);
+   [mup(:,t+1), SPp(:,:,t+1)] = UKF_PU(muf(:,t), SPf(:,:,t), U(:,t+1), f);
+   
+   % TTF
+   dt(1:29) = dt(2:30);
+   dt(30) = toc(dtt);
+   ttf = degrees2dm(sum(dt)/30*(data.ALL.N - t)/60);
+   disp(['ETA Filtering: ' num2str(ttf(1), '%.0f') 'm ' num2str(ttf(2), '%.2f') 's'])
 end
 
+data.ALL.Xf = muf;
+data.AUV.filtered = data.ALL.Xf(1:12, :);
+data.WAMV.filtered = data.ALL.Xf(13:24, :);
+data.QUAD.filtered = data.ALL.Xf(25:36, :);
 %% PLOT ALL THE THINGS (For now)
 % Plot states (True, est. mono, est. distributed)
 % ETA data
@@ -161,7 +197,7 @@ if (param.enabled(1))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + 1);
-        plot(data.AUV.raw.t, data.AUV.raw.X(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        plot(data.AUV.t, data.AUV.raw.X(row,:)*scales(row), data.AUV.t, data.AUV.filtered(row,:)*scales(row));
         grid on;
         t = titles(row);
         title(t{:}, 'Interpreter', 'latex');
@@ -179,7 +215,7 @@ if (param.enabled(2))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + sum(param.enabled(1:2)));
-        plot(data.WAMV.raw.t, data.WAMV.raw.X(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        plot(data.WAMV.raw.t, data.WAMV.raw.X(row,:)*scales(row), data.WAMV.t, data.WAMV.filtered(row,:)*scales(row));
         grid on;
         t = titles(row);
         title(t{:}, 'Interpreter', 'latex');
@@ -196,7 +232,7 @@ if (param.enabled(3))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + sum(param.enabled));
-        plot(data.QUAD.raw.t, data.QUAD.raw.X(row,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        plot(data.QUAD.raw.t, data.QUAD.raw.X(row,:)*scales(row), data.QUAD.t, data.QUAD.filtered(row,:)*scales(row));
         grid on;
         t = titles(row);
         title(t{:}, 'Interpreter', 'latex');
@@ -215,7 +251,7 @@ if (param.enabled(1))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + 1);
-        plot(data.AUV.raw.t, data.AUV.raw.X(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        plot(data.AUV.raw.t, data.AUV.raw.X(row + 6,:)*scales(row), data.AUV.t, data.AUV.filtered(row+6,:)*scales(row));
         grid on;
         t = titles(row);
         title(t{:}, 'Interpreter', 'latex');
@@ -233,7 +269,7 @@ if (param.enabled(2))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + sum(param.enabled(1:2)));
-        plot(data.WAMV.raw.t, data.WAMV.raw.X(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        plot(data.WAMV.raw.t, data.WAMV.raw.X(row + 6,:)*scales(row), data.WAMV.t, data.WAMV.filtered(row+6,:)*scales(row));
         grid on;
         t = titles(row);
         title(t{:}, 'Interpreter', 'latex');
@@ -250,7 +286,7 @@ if (param.enabled(3))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + sum(param.enabled));
-        plot(data.QUAD.raw.t, data.QUAD.raw.X(row + 6,:)*scales(row));% data.QUAD.filtered.t, data.QUAD.filtered.
+        plot(data.QUAD.raw.t, data.QUAD.raw.X(row + 6,:)*scales(row), data.QUAD.t, data.QUAD.filtered(row+6,:)*scales(row));
         grid on;
         t = titles(row);
         title(t{:}, 'Interpreter', 'latex');
