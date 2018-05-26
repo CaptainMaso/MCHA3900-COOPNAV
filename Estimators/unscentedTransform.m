@@ -30,12 +30,12 @@ for i = 1:n
 end
 xsigma(:,2*n+1) = mux;
 
-% % Apply constraints
-% if nargin >= 4
-%     for i = 1:nsigma
-%         xsigma(:,i) = c(xsigma(:,i));
-%     end
-% end
+% Apply constraints
+if nargin >= 4
+    for i = 1:nsigma
+        xsigma(:,i) = c(xsigma(:,i));
+    end
+end
 
 % Transform the sigma points through the function
 [temp,SR] = h(xsigma(:,nsigma));  	% Use function eval at mean to extract SR and
