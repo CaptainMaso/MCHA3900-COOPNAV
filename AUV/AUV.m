@@ -76,7 +76,7 @@ param.AUV.Kgain = [param.AUV.K(:,1:10) param.AUV.K(:,11:15)];
 
 % Initial and final conditions
 param.AUV.etai = [0; 0; 0; 0; 0; 0; 0; 0];
-param.AUV.etad5 = [0; 0; 0; 0; 5]; % Get desired eta for the 3 dof of choice
+param.AUV.etad5 = [5; -5; 0.5; 0; 0.3]; % Get desired eta for the 3 dof of choice
 
 %% check eigenvalues
 eigABK = eig(param.AUV.MatrixAa - param.AUV.MatrixBa*param.AUV.K);
