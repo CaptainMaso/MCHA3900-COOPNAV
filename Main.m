@@ -162,21 +162,52 @@ SPp(:,:,1)   = SQ0;
 U = [zeros(m,1), data.ALL.U];
 
 for t = 1:data.ALL.N
-    dtt = tic;
+%     dtt = tic;
+%     
+%    % Measurement update
+%    g = @(x,u) measurementModelMonolithic(x,u);
+%    [muf(:,t), SPf(:,:,t)]     = UKF_MU(data.ALL.Y(:,t), mup(:,t), SPp(:,:,t), U(:,t), g);
+%    
+%    % Process Update
+%    f = @(x,u) processModelMonolithic(x,u);
+%    [mup(:,t+1), SPp(:,:,t+1)] = UKF_PU(muf(:,t), SPf(:,:,t), U(:,t+1), f);
+%    
+
+      % AUV MU
+    u = U(1:6,t);
+    f =  @(x,u) measurementModelAUV(x,u);
+    jointFunc               = @(x,u) augmentIdentityAdapter(f, x, u);
+    [muxy,Syx]              = unscentedTransform(mup, SPp, jointFunc, u);
+    [muf_auv, SPf_auv]       = conditionGaussianOnMarginal(muxy, Syx, Y(1:param.AUV.datalength,t));       
+    offset = param.AUV.datalength;
+   % WAMV MU
+    u = U(7:12,t);
+    f =  @(x,u) measurementModelWAMV(x,u);
+    jointFunc               = @(x,u) augmentIdentityAdapter(f, x, u);
+    [muxy,Syx]              = unscentedTransform(mup, SPp, jointFunc, u);
+    [muf_wamv, SPf_wamv]       = conditionGaussianOnMarginal(muxy, Syx, Y(param.AUV.datalength+1:param.AUV.datalength+param.WAMV.datalength,t));
+    offset = offset + param.WAMV.datalength;
+   %QUAD MU
+    u = U(13:18,t);
+    f =  @(x,u) measurementModelQUAD(x,u);
+    jointFunc               = @(x,u) augmentIdentityAdapter(f, x, u);
+    [muxy,Syx]              = unscentedTransform(mup, SPp, jointFunc, u);
+    [muf_quad, SPf_quad]       = conditionGaussianOnMarginal(muxy, Syx, Y(param.AUV.datalength+param.WAMV.datalength+1:param.AUV.datalength+param.WAMV.datalength+ param.QUAD.datalength,t));
     
-   % Measurement update
-   g = @(x,u) measurementModelMonolithic(x,u);
-   [muf(:,t), SPf(:,:,t)]     = UKF_MU(data.ALL.Y(:,t), mup(:,t), SPp(:,:,t), U(:,t), g);
+    SPf_mono = inv(inv(SPf_auv) + inv(SPf_wamv) + inv(SPf_quad) - 2*inv(SPp));
+    muf_mono(:,t) = SPf_mono*(SPf_auv\muf_auv + SPf_wamv\muf_wamv + SPf_quad\muf_quad - 2*inv(SPp)*mup);
    
-   % Process Update
-   f = @(x,u) processModelMonolithic(x,u);
-   [mup(:,t+1), SPp(:,:,t+1)] = UKF_PU(muf(:,t), SPf(:,:,t), U(:,t+1), f);
-   
+    % UKF_PU   
+    u = U(:,t+1);
+    processFunc  = @(x,u) processModelMonolithic(x, u);
+    [mu_next, S_next] = unscentedTransform(muf_mono(:,t), SPf_mono, processFunc, u);
+    
    % TTF
    dt(1:29) = dt(2:30);
    dt(30) = toc(dtt);
    ttf = degrees2dm(sum(dt)/30*(data.ALL.N - t)/60);
    disp(['ETA Filtering: ' num2str(ttf(1), '%.0f') 'm ' num2str(ttf(2), '%.2f') 's'])
+       
 end
 
 data.ALL.Xf = muf;
