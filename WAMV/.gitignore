@@ -1,5 +1,6 @@
 # Windows default autosave extension
 *.asv
+desktop.ini
 
 # OSX / *nix default autosave extension
 *.m~
@@ -26,3 +27,4 @@ sccprj/
 
 # Octave session info
 octave-workspace
+*.slxc
