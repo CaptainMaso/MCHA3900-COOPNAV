@@ -73,8 +73,8 @@ if (param.enabled(1))
     data.AUV.dnu    = AUV_states.Data(:, 13:18)';
     data.AUV.U          = AUV_U.Data';
 
-    param.AUV.datalength = param.IMU.datalength + ...
-                           param.HAP.datalength;
+    param.AUV.datalength = param.IMU.datalength;% + ...
+                           %param.HAP.datalength;
     
     clearvars -except data param map
     disp('Finished AUV SIM');
@@ -90,9 +90,9 @@ if (param.enabled(2))
     data.WAMV.dnu   = WAMV_states.Data(:, 13:18)';
     data.WAMV.U         = WAMV_U.Data';
     
-    param.WAMV.datalength = param.IMU.datalength + ...
-                            param.GPS.datalength  + ...
-                            param.VB.datalength * map.VB.N;
+    param.WAMV.datalength = param.IMU.datalength;% + ...
+                            %param.GPS.datalength;%  + ...
+                            %param.VB.datalength * map.VB.N;
 
     clearvars -except data param map
     disp('Finished WAMV SIM');
@@ -106,10 +106,10 @@ if (param.enabled(3))
     data.QUAD.dnu   = QUAD_states.Data(:, 13:18)';
     data.QUAD.U         = QUAD_U.Data';
     
-    param.QUAD.datalength = param.IMU.datalength + ...
-                            param.GPS.datalength  + ...
-                            param.VB.datalength*(map.VB.N+1) + ...
-                            param.LPS.datalength*(map.LPS.N+1);
+    param.QUAD.datalength = param.IMU.datalength;% + ...
+                            %param.GPS.datalength;  + ...
+                            %param.VB.datalength*(map.VB.N+1) + ...
+                            %param.LPS.datalength*(map.LPS.N+1);
 
     clearvars -except data param map
     disp('Finished QUAD SIM');
@@ -122,7 +122,7 @@ data.ALL.U     = [data.AUV.U; data.WAMV.U; data.QUAD.U];
 
 
 % Get all Data
-data.ALL.raw = zeros(param.AUV.datalength + ...
+data.ALL.Y = zeros(param.AUV.datalength + ...
                      param.WAMV.datalength + ...
                      param.QUAD.datalength ,param.tf*param.sensor_sample_rate);
 
@@ -297,68 +297,68 @@ if (param.enabled(3))
     end
 end
 
-% ---------- TauB data
-figure(3);
-% ---------- AUV TauB data
-if (param.enabled(1))
-    titles = {{'AUV';'SURGE Forces'}, 'SWAY Forces', 'HEAVE Forces', 'ROLL Forces', 'PITCH Forces', 'YAW Forces'};
-    ylabels = {'X (N)', 'V (N)', 'Z (N)', 'K (Nm)', 'M (Nm)', 'N (Nm)'};
-    xlabels = {'','','','','','Time (s)'};
-    
-    TauB = param.AUV.MRB*data.AUV.dnu;
-    
-    for row=1:rows
-        subplot(rows,columns,(row-1)*columns + 1);
-        
-        plot(data.AUV.t, TauB(row,:));% data.QUAD.Xf.t, data.QUAD.Xf.
-        grid on;
-        t = titles(row);
-        title(t{:}, 'Interpreter', 'latex');
-        ylabel(ylabels(row), 'Interpreter', 'latex');
-        xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
-    end
-
-end
-% ---------- WAMV NU data
-if (param.enabled(2))
-    titles = {{'WAMV';'SURGE Forces'}, 'SWAY Forces', 'HEAVE Forces', 'ROLL Forces', 'PITCH Forces', 'YAW Forces'};
-    ylabels = {'X (N)', 'V (N)', 'Z (N)', 'K (Nm)', 'M (Nm)', 'N (Nm)'};
-    xlabels = {'','','','','','Time (s)'};
-    
-    TauB = param.WAMV.MRB*data.WAMV.dnu;
-    
-    for row=1:rows
-        subplot(rows,columns,(row-1)*columns + sum(param.enabled(1:2)));
-        
-        plot(data.WAMV.t, TauB(row,:));% data.QUAD.Xf.t, data.QUAD.Xf.
-        grid on;
-        t = titles(row);
-        title(t{:}, 'Interpreter', 'latex');
-        ylabel(ylabels(row), 'Interpreter', 'latex');
-        xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
-    end
-end
-% ---------- QUAD NU data
-if (param.enabled(3))
-    titles = {{'QUAD';'SURGE Forces'}, 'SWAY Forces', 'HEAVE Forces', 'ROLL Forces', 'PITCH Forces', 'YAW Forces'};
-    ylabels = {'X (N)', 'V (N)', 'Z (N)', 'K (Nm)', 'M (Nm)', 'N (Nm)'};
-    xlabels = {'','','','','','Time (s)'};
-    
-    TauB = param.QUAD.MRB*data.QUAD.dnu;
-    
-    for row=1:rows
-        subplot(rows,columns,(row-1)*columns + sum(param.enabled));
-        
-        plot(data.QUAD.t, TauB(row,:));% data.QUAD.Xf.t, data.QUAD.Xf.
-        grid on;
-        t = titles(row);
-        title(t{:}, 'Interpreter', 'latex');
-        ylabel(ylabels(row), 'Interpreter', 'latex');
-        xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
-    end
-end
+% % ---------- TauB data
+% figure(3);
+% % ---------- AUV TauB data
+% if (param.enabled(1))
+%     titles = {{'AUV';'SURGE Forces'}, 'SWAY Forces', 'HEAVE Forces', 'ROLL Forces', 'PITCH Forces', 'YAW Forces'};
+%     ylabels = {'X (N)', 'V (N)', 'Z (N)', 'K (Nm)', 'M (Nm)', 'N (Nm)'};
+%     xlabels = {'','','','','','Time (s)'};
+%     
+%     TauB = param.AUV.MRB*data.AUV.dnu;
+%     
+%     for row=1:rows
+%         subplot(rows,columns,(row-1)*columns + 1);
+%         
+%         plot(data.AUV.t, TauB(row,:));% data.QUAD.Xf.t, data.QUAD.Xf.
+%         grid on;
+%         t = titles(row);
+%         title(t{:}, 'Interpreter', 'latex');
+%         ylabel(ylabels(row), 'Interpreter', 'latex');
+%         xlabel(xlabels(row), 'Interpreter', 'latex');
+%         legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+%     end
+% 
+% end
+% % ---------- WAMV NU data
+% if (param.enabled(2))
+%     titles = {{'WAMV';'SURGE Forces'}, 'SWAY Forces', 'HEAVE Forces', 'ROLL Forces', 'PITCH Forces', 'YAW Forces'};
+%     ylabels = {'X (N)', 'V (N)', 'Z (N)', 'K (Nm)', 'M (Nm)', 'N (Nm)'};
+%     xlabels = {'','','','','','Time (s)'};
+%     
+%     TauB = param.WAMV.MRB*data.WAMV.dnu;
+%     
+%     for row=1:rows
+%         subplot(rows,columns,(row-1)*columns + sum(param.enabled(1:2)));
+%         
+%         plot(data.WAMV.t, TauB(row,:));% data.QUAD.Xf.t, data.QUAD.Xf.
+%         grid on;
+%         t = titles(row);
+%         title(t{:}, 'Interpreter', 'latex');
+%         ylabel(ylabels(row), 'Interpreter', 'latex');
+%         xlabel(xlabels(row), 'Interpreter', 'latex');
+%         legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+%     end
+% end
+% % ---------- QUAD NU data
+% if (param.enabled(3))
+%     titles = {{'QUAD';'SURGE Forces'}, 'SWAY Forces', 'HEAVE Forces', 'ROLL Forces', 'PITCH Forces', 'YAW Forces'};
+%     ylabels = {'X (N)', 'V (N)', 'Z (N)', 'K (Nm)', 'M (Nm)', 'N (Nm)'};
+%     xlabels = {'','','','','','Time (s)'};
+%     
+%     TauB = param.QUAD.MRB*data.QUAD.dnu;
+%     
+%     for row=1:rows
+%         subplot(rows,columns,(row-1)*columns + sum(param.enabled));
+%         
+%         plot(data.QUAD.t, TauB(row,:));% data.QUAD.Xf.t, data.QUAD.Xf.
+%         grid on;
+%         t = titles(row);
+%         title(t{:}, 'Interpreter', 'latex');
+%         ylabel(ylabels(row), 'Interpreter', 'latex');
+%         xlabel(xlabels(row), 'Interpreter', 'latex');
+%         legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+%     end
+% end
 
 clearvars -except data param map

@@ -2,7 +2,7 @@ function [Y_QUAD, SR_QUAD] = measurementModelQUAD(Xm, U_QUAD)
 global param
 monolithicOffset = 12*2; % Offset 2 for QUAD
 quad_etanu = Xm(1+monolithicOffset:12+monolithicOffset);
-quad_dnu = quad_detanu([U_QUAD;quad_etanu]);
+quad_detanu_t = quad_detanu([U_QUAD;quad_etanu]);
 
 monolithicOffset = 12*1; % Offset 1 for WAMV
 wamv_etanu = Xm(1+monolithicOffset:12+monolithicOffset);
@@ -16,13 +16,13 @@ rWQn    = wamv_etanu(1:3) - quad_etanu(1:3);
 rWQq    = Rnq'*rWQn;
 
 % Gets IMU data
-[Y_IMU, SR_IMU] = GetIMUData([quad_etanu;quad_dnu], quad_gyrobias);
+[Y_IMU, SR_IMU] = GetIMUData([quad_etanu;quad_detanu_t(7:12)], quad_gyrobias);
 
 % Gets GPS data
-[Y_GPS, SR_GPS] = GetGPSData([quad_etanu;quad_dnu]);
+[Y_GPS, SR_GPS] = GetGPSData([quad_etanu;quad_detanu_t(7:12)]);
 
 % Gets VB Data
-[Y_VB,SR_VB]    = GetVBData([quad_etanu;quad_dnu]);
+[Y_VB,SR_VB]    = GetVBData([quad_etanu;quad_detanu_t(7:12)]);
 
 if (norm(rWQq) == 0)
    vb_wamv = [0;0;0];
@@ -34,7 +34,7 @@ SR_VB   = blkdiag(SR_VB, param.VB.sigma);
 Y_VB    = [Y_VB;vb_wamv];           % Adds normalised bearing vector from quad to wamv
 
 % Gets LPS Data
-[Y_LPS,SR_LPS] = GetLPSData([quad_etanu;quad_dnu]);
+[Y_LPS,SR_LPS] = GetLPSData([quad_etanu;quad_detanu_t]);
 
 lps_wamv = norm(rWQn);
 
