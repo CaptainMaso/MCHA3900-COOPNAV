@@ -7,7 +7,7 @@ addpath('Sensors');
 addpath('Common');
 addpath('Estimators');
 
-warning('off', 'MATLAB:legend:IgnoringExtraEntries');
+%warning('off', 'MATLAB:legend:IgnoringExtraEntries');
 
 global param map data
 %% Parameter Initialisation
@@ -45,7 +45,7 @@ param.HAP.sigma      = eye(3)*3;       % Noise on HAP data (m)
 param.HAP.datalength = 3;
 
 % --- Simulation Parameters
-param.tf = 50;
+param.tf = 15;
 
 % --- Vehicle Uncertainties
 param.AUV.SQeta = diag([1 1 1, deg2rad([10 10 10])]);
@@ -73,8 +73,8 @@ if (param.enabled(1))
     data.AUV.dnu    = AUV_states.Data(:, 13:18)';
     data.AUV.U          = AUV_U.Data';
 
-    param.AUV.datalength = param.IMU.datalength + ...
-                           param.HAP.datalength;
+    param.AUV.datalength = param.IMU.datalength;% + ...
+                           %param.HAP.datalength;
     
     clearvars -except data param map
     disp('Finished AUV SIM');
@@ -91,8 +91,8 @@ if (param.enabled(2))
     data.WAMV.U         = WAMV_U.Data';
     
     param.WAMV.datalength = param.IMU.datalength + ...
-                            param.GPS.datalength  + ...
-                            param.VB.datalength * map.VB.N;
+                            param.GPS.datalength;%  + ...
+                            %param.VB.datalength * map.VB.N;
 
     clearvars -except data param map
     disp('Finished WAMV SIM');
@@ -107,9 +107,9 @@ if (param.enabled(3))
     data.QUAD.U         = QUAD_U.Data';
     
     param.QUAD.datalength = param.IMU.datalength + ...
-                            param.GPS.datalength  + ...
-                            param.VB.datalength*(map.VB.N+1) + ...
-                            param.LPS.datalength*(map.LPS.N+1);
+                            param.GPS.datalength;%  + ...
+                            %param.VB.datalength*(map.VB.N+1) + ...
+                            %param.LPS.datalength*(map.LPS.N+1);
 
     clearvars -except data param map
     disp('Finished QUAD SIM');
@@ -126,7 +126,14 @@ data.ALL.raw = zeros(param.AUV.datalength + ...
                      param.WAMV.datalength + ...
                      param.QUAD.datalength ,param.tf*param.sensor_sample_rate);
 
-dt = zeros(30,1);                 
+dt = zeros(30,1); 
+
+data.AUV.Y = zeros(param.AUV.datalength, param.tf*param.sensor_sample_rate);
+data.WAMV.Y = zeros(param.WAMV.datalength, param.tf*param.sensor_sample_rate);
+data.QUAD.Y = zeros(param.QUAD.datalength, param.tf*param.sensor_sample_rate);
+data.ALL.Y = zeros(param.AUV.datalength + ...
+                     param.WAMV.datalength + ...
+                     param.QUAD.datalength ,param.tf*param.sensor_sample_rate);
 
 data.AUV.IMU = zeros(param.IMU.datalength, data.ALL.N);
 data.AUV.HAP = zeros(param.HAP.datalength, data.ALL.N);
@@ -142,62 +149,34 @@ data.QUAD.LPS   = zeros(param.LPS.datalength * (map.LPS.N+1), data.ALL.N);
 
 for t = 1:data.ALL.N
     dtt = tic;
-    % ----------- AUV DATA
-    % Gets AUV IMU data
-    [data.AUV.IMU(:,t),~] = GetIMUData([data.AUV.X(:,t);data.AUV.dnu(:,t)], 0*param.IMU.gyro_bias);
-    %Y_IMU = Y_IMU + SR_IMU*randn(size(SR_IMU,1),1);
-
-    % Gets AUV HAP data
-    [data.AUV.HAP(:,t), ~] = GetHAPData([data.AUV.X(:,t);data.AUV.dnu(:,t)], data.AUV.dnu(:,t));
-    %Y_HAP = Y_HAP + SR_HAP*randn(size(SR_HAP,1),1);
-
-    % ------------- WAMV DATA
-    % Gets WAMV IMU data
-    [data.WAMV.IMU(:,t), ~] = GetIMUData([data.WAMV.X(:,t);data.WAMV.dnu(:,t)], 0*param.IMU.gyro_bias);
-    %Y_IMU = Y_IMU + SR_IMU*randn(size(SR_IMU,1),1);
-
-    % Gets WAMV GPS data
-    [data.WAMV.GPS(:,t), ~] = GetGPSData([data.WAMV.X(:,t);data.WAMV.dnu(:,t)]);
-    %Y_GPS = Y_GPS + SR_GPS*randn(size(SR_GPS,1),1);
-
-    % Gets VB Data
-    [data.WAMV.VB(:,t),~]  = GetVBData([data.WAMV.X(:,t);data.WAMV.dnu(:,t)]);
-    %Y_VB = Y_VB + SR_VB*randn(size(SR_VB,1),1);
     
-    % -------------------- QUAD DATA
-    % Get vector from QUAD to WAMV in b (rWQb)
-    Rnq     = eulerRotation(data.QUAD.X(4:6,t));
-    rWQn    = data.WAMV.X(1:3,t) - data.QUAD.X(1:3,t);
-    rWQq    = Rnq'*rWQn;
-
-    % Gets IMU data
-    [data.QUAD.IMU(:,t), ~] = GetIMUData([data.QUAD.X(:,t);data.QUAD.dnu(:,t)],0*param.IMU.gyro_bias);
-    %Y_IMU = Y_IMU + SR_IMU*randn(size(SR_IMU,1),1);
-
-    % Gets GPS data
-    [data.QUAD.GPS(:,t), ~] = GetGPSData([data.QUAD.X(:,t);data.QUAD.dnu(:,t)]);
-    %Y_GPS = Y_GPS + SR_GPS*randn(size(SR_GPS,1),1);
-
-    % Gets VB Data
-    [Y_VB,~]    = GetVBData([data.QUAD.X(:,t);data.QUAD.dnu(:,t)]);
-
-    if (norm(rWQq) == 0)
-       vb_wamv = [0;0;0];
-    else
-       vb_wamv = rWQq/norm(rWQq);
-    end
-
-    %SR_VB   = blkdiag(SR_VB, param.VB.sigma);
-    data.QUAD.VB(:,t)    = [Y_VB;vb_wamv];% + SR_VB*randn(size(SR_VB,1),1);  % Adds normalised bearing vector from quad to wamv
-
-    % Gets LPS Data
-    [Y_LPS,~] = GetLPSData([data.QUAD.X(:,t);data.QUAD.dnu(:,t)]);
-
-    lps_wamv = norm(rWQn);
-
-    %SR_LPS  = blkdiag(SR_LPS, param.LPS.sigma);
-    data.QUAD.LPS(:,t)   = [Y_LPS; lps_wamv];% + SR_LPS*randn(size(SR_LPS,1),1);     % Adds distance from quad to wamv to LPS data
+    % Get AUV data
+    [data.AUV.Y(:,t),SR_AUV] = getRawDataAUV(data.AUV.X(:,t), data.AUV.dnu(:,t), data.WAMV.X(1:6,t), zeros(3,1));
+    data.AUV.Y(:,t)     = data.AUV.Y(:,t) + SR_AUV*randn(size(SR_AUV,1),1);
+    data.AUV.IMU(:,t)   = data.AUV.Y(1:9,t);
+    %data.AUV.HAP(:,t)   = data.AUV.Y(10:12,t);
     
+    % Get WAMV data
+    [data.WAMV.Y(:,t),SR_WAMV] = getRawDataWAMV(data.WAMV.X(:,t), data.WAMV.dnu(:,t), zeros(3,1));
+    data.WAMV.Y(:,t)  = data.WAMV.Y(:,t) + SR_WAMV*randn(size(SR_WAMV,1),1);
+    data.WAMV.IMU(:,t)   = data.WAMV.Y(1:9,t);
+    data.WAMV.GPS(:,t)   = data.WAMV.Y(10:12,t);
+    %vboffset = param.VB.datalength*map.VB.N;
+    %data.WAMV.VB(:,t)    = data.WAMV.Y(13:13+vboffset-1, t);
+    
+    % Get QUAD data
+    [data.QUAD.Y(:,t),SR_QUAD] = getRawDataQUAD(data.QUAD.X(:,t), data.QUAD.dnu(:,t), data.WAMV.X(1:6,t), zeros(3,1));
+    data.QUAD.Y(:,t)  = data.QUAD.Y(:,t) + SR_QUAD*randn(size(SR_QUAD,1),1);
+    data.QUAD.IMU(:,t)   = data.QUAD.Y(1:9,t);
+    data.QUAD.GPS(:,t)   = data.QUAD.Y(10:12,t);
+    
+    %vboffset    = param.VB.datalength*(map.VB.N+1);
+    %lpsoffset   = param.LPS.datalength*(map.LPS.N+1);
+    
+    %data.QUAD.VB(:,t)    = data.QUAD.Y(13:13+vboffset-1, t);
+    %data.QUAD.LPS(:,t)   = data.QUAD.Y(13+vboffset:13+vboffset+lpsoffset-1, t);
+    
+    % TTF    
     dt(1:29) = dt(2:30);
     dt(30) = toc(dtt);
     ttf = degrees2dm(sum(dt)/30*(data.ALL.N - t)/60);
@@ -215,19 +194,38 @@ for t = 1:data.ALL.N
     data.AUV.Est(13:15,1,t) = data.AUV.IMU(1:3,t) + param.g*[0,0,1]';      % Matching Accelerometer to dnu
     %data.AUV.Est(4:6,1,t)  = data.AUV.IMU(7:9          % Figure out how to
     %match Magnetometer with angles (Can only get certain angles from it?
-    data.AUV.Est(4,1,t)     = atan2(data.AUV.IMU(8,t),data.AUV.IMU(9,t));
-    data.AUV.Est(5,1,t)     = atan2(data.AUV.IMU(7,t),data.AUV.IMU(9,t));
+    data.AUV.Est(4,1,t)     = atan2(-data.AUV.IMU(9,t), data.AUV.IMU(8,t));
+    data.AUV.Est(5,1,t)     = atan2(-data.AUV.IMU(9,t), data.AUV.IMU(7,t));
+    data.AUV.Est(6,1,t)     = atan2(data.AUV.IMU(8,t), data.AUV.IMU(7,t));
     
     % HAP estimate of AUV state (Eh can do later)
-    
+    Rwn = eulerRotation(data.WAMV.X(4:6, t));
+    data.AUV.Est(1:3,1,t)     = Rwn'*data.AUV.HAP(1:3,t) + data.WAMV.GPS(1:3,t);
     
     % IMU estimate of WAMV state
     data.WAMV.Est(10:12,1,t) = data.WAMV.IMU(4:6,t);       % Matching gyro to angular velocities
     data.WAMV.Est(13:15,1,t) = data.WAMV.IMU(1:3,t) + param.g*[0,0,1]';      % Matching Accelerometer to dnu
     
+    data.WAMV.Est(6,1,t)     = atan2(data.WAMV.IMU(8,t), data.WAMV.IMU(7,t));
+    data.WAMV.Est(4,1,t)     = atan2(-data.WAMV.IMU(9,t), data.WAMV.IMU(8,t));
+    data.WAMV.Est(5,1,t)     = atan2(-data.WAMV.IMU(9,t), data.WAMV.IMU(7,t));
+    
+    
+    data.WAMV.Est(1,1,t)     = data.WAMV.GPS(1,t);
+    data.WAMV.Est(2,1,t)     = data.WAMV.GPS(2,t);
+    data.WAMV.Est(3,1,t)     = data.WAMV.GPS(3,t);
+    
     % IMU estimate of QUAD state
     data.QUAD.Est(10:12,1,t) = data.QUAD.IMU(4:6,t);       % Matching gyro to angular velocities
     data.QUAD.Est(13:15,1,t) = data.QUAD.IMU(1:3,t) + param.g*[0,0,1]';      % Matching Accelerometer to dnu
+    
+    data.QUAD.Est(4,1,t)     = atan2(-data.QUAD.IMU(9,t), data.QUAD.IMU(8,t));
+    data.QUAD.Est(5,1,t)     = atan2(-data.QUAD.IMU(9,t), data.QUAD.IMU(7,t));
+    data.QUAD.Est(6,1,t)     = atan2(data.QUAD.IMU(8,t), data.QUAD.IMU(7,t));
+    
+    data.QUAD.Est(1,1,t)     = data.QUAD.GPS(1,t);
+    data.QUAD.Est(2,1,t)     = data.QUAD.GPS(2,t);
+    data.QUAD.Est(3,1,t)     = data.QUAD.GPS(3,t);
     
 end
 
@@ -252,7 +250,7 @@ if (param.enabled(1))
         title(t{:}, 'Interpreter', 'latex');
         ylabel(ylabels(row), 'Interpreter', 'latex');
         xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+        %legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
     end
 end
 
@@ -270,7 +268,7 @@ if (param.enabled(2))
         title(t{:}, 'Interpreter', 'latex');
         ylabel(ylabels(row), 'Interpreter', 'latex');
         xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+        %legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
     end
 end
 % --- QUAD ETA data
@@ -287,10 +285,10 @@ if (param.enabled(3))
         title(t{:}, 'Interpreter', 'latex');
         ylabel(ylabels(row), 'Interpreter', 'latex');
         xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+        %legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
     end
 end
-% ---------- NU data
+% % ---------- NU data
 figure(2);
 % ---------- AUV NU data
 if (param.enabled(1))
@@ -306,7 +304,7 @@ if (param.enabled(1))
         title(t{:}, 'Interpreter', 'latex');
         ylabel(ylabels(row), 'Interpreter', 'latex');
         xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+        %legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
     end
 
 end
@@ -324,7 +322,7 @@ if (param.enabled(2))
         title(t{:}, 'Interpreter', 'latex');
         ylabel(ylabels(row), 'Interpreter', 'latex');
         xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+        %legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
     end
 end
 % ---------- QUAD NU data
@@ -341,11 +339,11 @@ if (param.enabled(3))
         title(t{:}, 'Interpreter', 'latex');
         ylabel(ylabels(row), 'Interpreter', 'latex');
         xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+        %legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
     end
 end
 
-% ---------- TauB data
+% % ---------- TauB data
 figure(3);
 % ---------- AUV TauB data
 if (param.enabled(1))
@@ -362,7 +360,7 @@ if (param.enabled(1))
         title(t{:}, 'Interpreter', 'latex');
         ylabel(ylabels(row), 'Interpreter', 'latex');
         xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+        %legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
     end
 
 end
@@ -381,7 +379,7 @@ if (param.enabled(2))
         title(t{:}, 'Interpreter', 'latex');
         ylabel(ylabels(row), 'Interpreter', 'latex');
         xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+        %legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
     end
 end
 % ---------- QUAD NU data
@@ -399,7 +397,7 @@ if (param.enabled(3))
         title(t{:}, 'Interpreter', 'latex');
         ylabel(ylabels(row), 'Interpreter', 'latex');
         xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
+        %legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
     end
 end
 
