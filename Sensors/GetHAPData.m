@@ -1,7 +1,11 @@
-function [y_HAP,SR] = GetHAPData(X_AUV, X_WAMV)
+function [rAWw,SR] = GetHAPData(X_AUV, X_WAMV)
 global param
 
+rANn = X_AUV(1:3);
+rWNn = X_WAMV(1:3);
+rAWn = rANn - rWNn;
 Rwn = eulerRotation(X_WAMV(4:6));
-y_HAP = Rwn*(X_AUV(1:3)-X_WAMV(1:3));
+
+rAWw = Rwn*rAWn;
 
 SR = param.HAP.sigma;
