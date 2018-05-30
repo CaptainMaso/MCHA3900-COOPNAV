@@ -12,9 +12,9 @@ auv_U   = Um(1:6);
 wamv_U  = Um(7:12);
 quad_U  = Um(13:18);
 
-[Y_AUV, SR_AUV]     = mm_auv(auv_etanu,   auv_U,  wamv_etanu(1:6), auv_gyrobias);
-[Y_WAMV, SR_WAMV]   = mm_wamv(wamv_etanu, wamv_U, wamv_gyrobias);
-[Y_QUAD, SR_QUAD]   = mm_quad(quad_etanu, quad_U, wamv_etanu(1:6), quad_gyrobias);
+[Y_AUV, SR_AUV]     = mm_auv([auv_etanu; wamv_etanu(1:6); auv_gyrobias],auv_U);
+[Y_WAMV, SR_WAMV]   = mm_wamv([wamv_etanu; wamv_gyrobias],wamv_U);
+[Y_QUAD, SR_QUAD]   = mm_quad([quad_etanu; wamv_etanu(1:6); quad_gyrobias],quad_U);
 
 %% Stack and Return
 Y_mono = [Y_AUV;Y_WAMV;Y_QUAD];

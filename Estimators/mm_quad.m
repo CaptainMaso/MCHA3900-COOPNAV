@@ -1,4 +1,8 @@
-function [Y_quad, SR_quad] = mm_quad(quad_etanu, quad_U, wamv_eta, quad_gyrobias)
+function [Y_quad, SR_quad] = mm_quad(X, quad_U)
+% function [Y_quad, SR_quad] = mm_quad(quad_etanu, quad_U, wamv_eta, quad_gyrobias)
+quad_etanu = X(1:12);
+wamv_eta = X(13:18);
+quad_gyrobias = X(19:21);
 % Get dnu (body-fixed accelerations)
 quad_dnu = quad_detanu([quad_U; quad_etanu]);
 quad_dnu = quad_dnu(7:12);

@@ -14,11 +14,11 @@ rWQq    = Rnq'*rWQn;
 % Gets VB Data
 [Y_VB,SR_VB]    = GetVBData([quad_etanu;quad_dnu]);
 
-if (norm(rWQq) == 0)
-   vb_wamv = [0;0;0];
-else
-    vb_wamv = rWQq/norm(rWQq);
-end
+ if (norm(rWQq) == 0)
+    vb_wamv = [0;0;0];
+ else
+     vb_wamv = rWQq/norm(rWQq);
+ end
 
 SR_VB   = blkdiag(SR_VB, param.VB.sigma);
 Y_VB    = [Y_VB;vb_wamv];           % Adds normalised bearing vector from quad to wamv
@@ -32,5 +32,5 @@ SR_LPS  = blkdiag(SR_LPS, param.LPS.sigma);
 Y_LPS   = [Y_LPS; lps_wamv];        % Adds distance from quad to wamv to LPS data
 
 % Stack and return
-Y_QUAD  = [Y_IMU;Y_GPS];%Y_VB;Y_LPS];
-SR_QUAD = blkdiag(SR_IMU,SR_GPS);%, SR_VB, SR_LPS);
+Y_QUAD  = [Y_IMU;Y_GPS;Y_VB;Y_LPS];
+SR_QUAD = blkdiag(SR_IMU,SR_GPS, SR_VB, SR_LPS);

@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.73"
+    ComputedModelVersion    "1.74"
     NumModelReferences	    0
     NumTestPointedSignals   0
     NumProvidedFunctions    0
@@ -56,7 +56,7 @@ Model {
       $ObjectID		      2
       $ClassName	      "Simulink.WindowInfo"
       IsActive		      [1]
-      Location		      [-7.0, -1087.0, 1935.0, 1055.0]
+      Location		      [-681.0, 129.0, 1935.0, 1055.0]
       Object {
 	$PropName		"ModelBrowserInfo"
 	$ObjectID		3
@@ -80,9 +80,9 @@ Model {
 	IsActive		[1]
 	ViewObjType		"SimulinkTopLevel"
 	LoadSaveID		"0"
-	Extents			[2824.0, 1334.0]
-	ZoomFactor		[1.25]
-	Offset			[10.713431962101481, 70.496500880432222]
+	Extents			[2825.0, 1335.0]
+	ZoomFactor		[0.99999999999999989]
+	Offset			[-43.597679149009878, 63.353643737574657]
       }
       Object {
 	$PropName		"DockComponentsInfo"
@@ -102,7 +102,7 @@ Model {
       "AAAAAAA+wAAABYARABvAGMAawBXAGkAZABnAGUAdAA0AAAAAAD/////AAAAAAAAAAD7AAAAUgBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0Ac"
       "ABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQAAAAAAP////8AAACSAP///wAAAAEAAAAAAAAAAPwCA"
       "AAAAfsAAABUAEcATABVAEUAMgA6AFAAcgBvAHAAZQByAHQAeQBJAG4AcwBwAGUAYwB0AG8AcgAvAFAAcgBvAHAAZQByAHQAeQAgAEkAbgBzAHAAZ"
-      "QBjAHQAbwByAAAAAAD/////AAAAPQD///8AAAtAAAAFhAAAAAEAAAACAAAAAQAAAAL8AAAAAQAAAAIAAAAP/////wAAAAAA/////wAAAAAAAAAA/"
+      "QBjAHQAbwByAAAAAAD/////AAAAPQD///8AAAtBAAAFhQAAAAEAAAACAAAAAQAAAAL8AAAAAQAAAAIAAAAP/////wAAAAAA/////wAAAAAAAAAA/"
       "////wEAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/"
       "////wEAAACp/////wAAAAAAAAAA/////wEAAAEu/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAHX/////wAAAAAAAAAA/"
       "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAR7/////wAAAAAAAAAA/"
@@ -116,9 +116,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "masom"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Fri May 25 15:01:47 2018"
-  RTWModifiedTimeStamp	  449160922
-  ModelVersionFormat	  "1.%<AutoIncrement:73>"
+  LastModifiedDate	  "Wed May 30 16:48:08 2018"
+  RTWModifiedTimeStamp	  449599651
+  ModelVersionFormat	  "1.%<AutoIncrement:74>"
   SampleTimeColors	  on
   SampleTimeAnnotations	  on
   LibraryLinkDisplay	  "none"
@@ -1818,7 +1818,7 @@ Model {
   }
   System {
     Name		    "WAMVmodel"
-    Location		    [-7, -1087, 1928, -32]
+    Location		    [-681, 129, 1254, 1184]
     Open		    on
     PortBlocksUseCompactNotation off
     SetDomainSpec	    off
@@ -1833,7 +1833,7 @@ Model {
     TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
     TiledPageScale	    1
     ShowPageBoundaries	    off
-    ZoomFactor		    "125"
+    ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
     SIDHighWatermark	    "93"
     Block {
@@ -2407,6 +2407,7 @@ Model {
       Ports		      [0, 1]
       Position		      [210, 75, 240, 105]
       ZOrder		      284
+      Amplitude		      "0.1"
       SampleTime	      "0"
     }
     Block {
@@ -2416,6 +2417,7 @@ Model {
       Ports		      [0, 1]
       Position		      [210, 110, 240, 140]
       ZOrder		      285
+      Amplitude		      "0.1"
       SampleTime	      "0"
     }
     Block {
@@ -2425,6 +2427,7 @@ Model {
       Ports		      [0, 1]
       Position		      [210, 150, 240, 180]
       ZOrder		      286
+      Amplitude		      "0.1"
       SampleTime	      "0"
     }
     Block {
