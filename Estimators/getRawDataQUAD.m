@@ -32,5 +32,5 @@ SR_LPS  = blkdiag(SR_LPS, param.LPS.sigma);
 Y_LPS   = [Y_LPS; lps_wamv];        % Adds distance from quad to wamv to LPS data
 
 % Stack and return
-Y_QUAD  = [Y_IMU;Y_GPS];%Y_VB;Y_LPS];
-SR_QUAD = blkdiag(SR_IMU,SR_GPS);%, SR_VB, SR_LPS);
+Y_QUAD  = [Y_IMU;Y_GPS;Y_VB;Y_LPS];
+SR_QUAD = blkdiag(SR_IMU,SR_GPS, SR_VB, SR_LPS);
