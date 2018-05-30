@@ -126,23 +126,6 @@ if (param.enabled(1))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + 1);
-<<<<<<< HEAD
-<<<<<<< HEAD
-        hold on;
-        plot(data.AUV.t, data.AUV.X(row + 6,:)*scales(row), data.AUV.t, data.AUV.Xf(row+6,:)*scales(row));
-        if (row > 3)
-            plot(data.AUV.t, data.AUV.gyrobias(row-3, :)*scales(row));
-        end
-        grid on;
-        t = titles(row);
-        title(t{:}, 'Interpreter', 'latex');
-        ylabel(ylabels(row), 'Interpreter', 'latex');
-        xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
-        hold off;
-=======
-=======
->>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
         if Mono_Sub_switch == 0
             plot(data_dist.AUV.t, data_dist.AUV.X(row + 6,:)*scales(row), data_dist.AUV.t, data_dist.AUV.Xf(row+6,:)*scales(row));
             grid on;
@@ -170,10 +153,6 @@ if (param.enabled(1))
             xlabel(xlabels(row), 'Interpreter', 'latex');
             legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');   
         end
-<<<<<<< HEAD
->>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
-=======
->>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
     end
 
 end
@@ -185,23 +164,6 @@ if (param.enabled(2))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + sum(param.enabled(1:2)));
-<<<<<<< HEAD
-<<<<<<< HEAD
-        hold on;
-        plot(data.WAMV.t, data.WAMV.X(row + 6,:)*scales(row), data.WAMV.t, data.WAMV.Xf(row+6,:)*scales(row));
-        if (row > 3)
-            plot(data.WAMV.t, data.WAMV.gyrobias(row-3, :)*scales(row));
-        end
-        grid on;
-        t = titles(row);
-        title(t{:}, 'Interpreter', 'latex');
-        ylabel(ylabels(row), 'Interpreter', 'latex');
-        xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
-        hold off;
-=======
-=======
->>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
         if Mono_Sub_switch == 0
             plot(data_dist.WAMV.t, data_dist.WAMV.X(row + 6,:)*scales(row), data_dist.WAMV.t, data_dist.WAMV.Xf(row+6,:)*scales(row));
             grid on;
@@ -229,10 +191,6 @@ if (param.enabled(2))
             xlabel(xlabels(row), 'Interpreter', 'latex');
             legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');   
         end
-<<<<<<< HEAD
->>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
-=======
->>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
     end
 end
 % ---------- QUAD NU data
@@ -243,23 +201,6 @@ if (param.enabled(3))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + sum(param.enabled));
-<<<<<<< HEAD
-<<<<<<< HEAD
-        hold on;
-        plot(data.QUAD.t, data.QUAD.X(row + 6,:)*scales(row), data.QUAD.t, data.QUAD.Xf(row+6,:)*scales(row));
-        if (row > 3)
-            plot(data.QUAD.t, data.QUAD.gyrobias(row-3, :)*scales(row));
-        end
-        grid on;
-        t = titles(row);
-        title(t{:}, 'Interpreter', 'latex');
-        ylabel(ylabels(row), 'Interpreter', 'latex');
-        xlabel(xlabels(row), 'Interpreter', 'latex');
-        legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
-        hold off;
-=======
-=======
->>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
         if Mono_Sub_switch == 0
             plot(data_dist.QUAD.t, data_dist.QUAD.X(row + 6,:)*scales(row), data_dist.QUAD.t, data_dist.QUAD.Xf(row+6,:)*scales(row));
             grid on;
@@ -287,10 +228,6 @@ if (param.enabled(3))
             xlabel(xlabels(row), 'Interpreter', 'latex');
             legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');   
         end
-<<<<<<< HEAD
->>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
-=======
->>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
     end
 end
 
