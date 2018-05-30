@@ -71,7 +71,11 @@ param.WAMV.datalength = param.IMU.datalength + ...
                         
 param.QUAD.datalength = param.IMU.datalength + ...
 <<<<<<< HEAD
+<<<<<<< HEAD
                         param.GPS.datalength  + ...
+=======
+                        param.GPS.datalength + ...
+>>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
 =======
                         param.GPS.datalength + ...
 >>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
@@ -210,6 +214,7 @@ data.ALL.SPf   = zeros(n,n,N+1);  % Prior and Posterior Squareroot Covariances
 
 % Set initial values
 <<<<<<< HEAD
+<<<<<<< HEAD
 % if (param.enabled(1)); data.AUV.SPf(:,:,1)  = 2*blkdiag(param.AUV.SQeta, param.AUV.SQnu);   data.AUV.SPbias(:,:,1)  = param.IMU.SQbias; end
 % if (param.enabled(2)); data.WAMV.SPf(:,:,1) = 2*blkdiag(param.WAMV.SQeta, param.WAMV.SQnu); data.WAMV.SPbias(:,:,1) = param.IMU.SQbias; end
 % if (param.enabled(3)); data.QUAD.SPf(:,:,1) = 2*blkdiag(param.QUAD.SQeta, param.QUAD.SQnu); data.QUAD.SPbias(:,:,1) = param.IMU.SQbias; end
@@ -217,6 +222,8 @@ data.ALL.SPf(:,:,1)     = 1e-3*blkdiag(param.AUV.SQeta, param.AUV.SQnu, ...
                                     param.WAMV.SQeta, param.WAMV.SQnu, ...
                                     param.QUAD.SQeta, param.QUAD.SQnu, ...
                                     param.IMU.SQbias0, param.IMU.SQbias0, param.IMU.SQbias0);
+=======
+>>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
 =======
 >>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
 
@@ -234,16 +241,22 @@ data.ALL.SPf(:,:,1)     = 1e-3*blkdiag(param.AUV.SQeta, param.AUV.SQnu, ...
 data_dist = data;   data_mono = data;
 for t = 1:data.ALL.N
 <<<<<<< HEAD
+<<<<<<< HEAD
      dtt = tic;
 
     % Measurement update - Monolithic
     g  = @(x,u) mm_mono(x,u);
     [data.ALL.Xf(:,t), data.ALL.SPf(:,:,t)]     = UKF_MU(data.ALL.Y(:,t), data.ALL.Xf(:,t), data.ALL.SPf(:,:,t), data.ALL.U(:,t), g);
 =======
+=======
+>>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
     dtt = tic;
 if Mono_Sub_switch ~= 0 && Mono_Sub_switch ~= 1 && Mono_Sub_switch ~= 2
     error('shits fucked');
 end
+<<<<<<< HEAD
+>>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
+=======
 >>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
 
 if Mono_Sub_switch == 0 || Mono_Sub_switch == 2    % Sub estimator stuff 
@@ -269,6 +282,7 @@ if Mono_Sub_switch == 0 || Mono_Sub_switch == 2    % Sub estimator stuff
     %     u = U(:,t+1);
     %     processFunc  = @(x,u) processModelMonolithic(x, u);
     %     [mu_next, S_next] = unscentedTransform(muf_mono(:,t), SPf_mono, processFunc, u);
+<<<<<<< HEAD
     f = @(x,u) pm_mono(x,u);
     [data_dist.ALL.Xf(:,t+1), data_dist.ALL.SPf(:,:,t+1)] = UKF_PU(data_dist.ALL.Xf(:,t), data_dist.ALL.SPf(:,:,t), data_dist.ALL.U(:,t+1), f);
 
@@ -283,6 +297,22 @@ if Mono_Sub_switch == 1 || Mono_Sub_switch == 2 % Mono stuff
     f = @(x,u) pm_mono(x,u);
     [data_mono.ALL.Xf(:,t+1), data_mono.ALL.SPf(:,:,t+1)] = UKF_PU(data_mono.ALL.Xf(:,t), data_mono.ALL.SPf(:,:,t), data_mono.ALL.U(:,t+1), f);
     f = @(x,u) pm_mono(x,u);
+=======
+    f = @(x,u) pm_mono(x,u);
+    [data_dist.ALL.Xf(:,t+1), data_dist.ALL.SPf(:,:,t+1)] = UKF_PU(data_dist.ALL.Xf(:,t), data_dist.ALL.SPf(:,:,t), data_dist.ALL.U(:,t+1), f);
+
+end
+
+if Mono_Sub_switch == 1 || Mono_Sub_switch == 2 % Mono stuff   
+    Mono_Sub_switch_mu = 1;
+%     Measurement update - Monolithic
+    g = @(x,u) mm_mono(x, u);
+    [data_mono.ALL.Xf(:,t), data_mono.ALL.SPf(:,:,t)]     = UKF_MU(data_mono.ALL.Y(:,t), data_mono.ALL.Xf(:,t), data_mono.ALL.SPf(:,:,t), data_mono.ALL.U(:,t), g,Mono_Sub_switch_mu);
+%     Process Update - Monolithic
+    f = @(x,u) pm_mono(x,u);
+    [data_mono.ALL.Xf(:,t+1), data_mono.ALL.SPf(:,:,t+1)] = UKF_PU(data_mono.ALL.Xf(:,t), data_mono.ALL.SPf(:,:,t), data_mono.ALL.U(:,t+1), f);
+    f = @(x,u) pm_mono(x,u);
+>>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
     [data_mono.ALL.Xf(:,t+1), data_mono.ALL.SPf(:,:,t+1)] = UKF_PU(data_mono.ALL.Xf(:,t), data_mono.ALL.SPf(:,:,t), data_mono.ALL.U(:,t+1), f);
     
 end
@@ -296,6 +326,7 @@ end
 
 %% Resize and separate filtered data
 <<<<<<< HEAD
+<<<<<<< HEAD
 data.ALL.Xf = data.ALL.Xf(:,1:end-1);
 %%
 data.AUV.Xf = data.ALL.Xf(1:12,:);
@@ -306,6 +337,8 @@ data.AUV.gyrobias = data.ALL.Xf(37:39,:);
 data.WAMV.gyrobias = data.ALL.Xf(40:42,:);
 data.QUAD.gyrobias = data.ALL.Xf(43:45,:);
 =======
+=======
+>>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
 if Mono_Sub_switch == 0 || Mono_Sub_switch == 2% dist stuff   
     data_dist.ALL.Xf = data_dist.ALL.Xf(:,1:end-1);
     data_dist.AUV.Xf = data_dist.ALL.Xf(1:12,:);
@@ -319,6 +352,9 @@ if Mono_Sub_switch == 1 || Mono_Sub_switch == 2% Mono stuff
     data_mono.WAMV.Xf = data_mono.ALL.Xf(13:24,:);
     data_mono.QUAD.Xf = data_mono.ALL.Xf(25:36,:);
 end
+<<<<<<< HEAD
+>>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
+=======
 >>>>>>> 9cb5aa03f0120a7a4d5036432d6cb270fcdfd97a
 %%
 close all
