@@ -38,7 +38,7 @@ param.IMU.magn_sigma = eye(3)*1e-3;
 param.IMU.datalength = 9;
 
 % ---- GPS parameters
-param.GPS.sigma      = eye(3)*1e0;       % Noise on gps data (m)
+param.GPS.sigma      = eye(3)*1e-1;       % Noise on gps data (m)
 param.GPS.datalength = 3;
 
 % ---- HAP parameters
@@ -46,20 +46,20 @@ param.HAP.sigma      = eye(3)*1e-4;       % Noise on HAP data (m)
 param.HAP.datalength = 3;
 
 % --- Simulation Parameters
-param.tf = 2;
+param.tf = 10;
 
 % --- Vehicle Uncertainties
 param.AUV.SQeta = diag([1e-2 1e-2 1e-2, deg2rad([20 20 20])])./param.sensor_sample_rate;
 param.AUV.SQnu  = diag([1e0 1e0 1e0,  deg2rad([40 40 40])])./param.sensor_sample_rate;
 
-param.WAMV.SQeta = diag([1e-2 1e-2 1e-2, deg2rad([5 5 5])])./param.sensor_sample_rate;
-param.WAMV.SQnu  = diag([5e-1 5e-1 5e0  deg2rad([60 60 25])])./param.sensor_sample_rate;
+param.WAMV.SQeta = diag([1e-2 1e-2 2e-2, deg2rad([15 15 5])])./param.sensor_sample_rate;
+param.WAMV.SQnu  = diag([5e-1 5e-1 5e0  deg2rad([3e3 3e3 25])])./param.sensor_sample_rate;
 
 param.QUAD.SQeta = diag([1e-2 1e-2 1e-2, deg2rad([1 1 1])])./param.sensor_sample_rate;
 param.QUAD.SQnu  = diag([2e1 2e1 2e2, deg2rad([5 5 5])])./param.sensor_sample_rate;
 
 param.IMU.SQbias     = diag(deg2rad([0.01 0.01 0.01]));
-param.IMU.SQbias0     = diag(deg2rad([1500 1500 1500]));
+param.IMU.SQbias0     = diag(deg2rad([1e3 1e3 1e3]));
 
 % --- Vehicle data parameters
 param.AUV.datalength  = param.IMU.datalength + ...
@@ -84,6 +84,7 @@ if (param.enabled(1))
     data.AUV.X          = AUV_states.Data(:, 1:12)';
     data.AUV.dnu        = AUV_states.Data(:, 13:18)';
     data.AUV.U          = AUV_U.Data';
+    data.AUV.U         = [zeros(size(data.AUV.U,1),1), data.AUV.U];
     
     clearvars -except data param map
     disp('Finished AUV SIM');
@@ -98,6 +99,7 @@ if (param.enabled(2))
     data.WAMV.X         = WAMV_states.Data(:, 1:12)';
     data.WAMV.dnu       = WAMV_states.Data(:, 13:18)';
     data.WAMV.U         = WAMV_U.Data';
+    data.WAMV.U         = [zeros(size(data.WAMV.U,1),1), data.WAMV.U];
 
     clearvars -except data param map
     disp('Finished WAMV SIM');
@@ -110,7 +112,8 @@ if (param.enabled(3))
     data.QUAD.X         = QUAD_states.Data(:, 1:12)';
     data.QUAD.dnu       = QUAD_states.Data(:, 13:18)';
     data.QUAD.U         = QUAD_U.Data';
-
+    data.QUAD.U         = [zeros(size(data.QUAD.U,1),1), data.QUAD.U];
+    
     clearvars -except data param map
     disp('Finished QUAD SIM');
 end
@@ -121,45 +124,39 @@ data.t = data.AUV.t;
 %% Simulate Sensor Data
 
 % Get all Data
-if (param.enabled(1)); data.AUV.Y  = zeros(param.AUV.datalength,  param.tf*param.sensor_sample_rate); end
-if (param.enabled(2)); data.WAMV.Y = zeros(param.WAMV.datalength, param.tf*param.sensor_sample_rate); end
-if (param.enabled(3)); data.QUAD.Y = zeros(param.QUAD.datalength, param.tf*param.sensor_sample_rate); end
+data.AUV.Y  = zeros(param.AUV.datalength,  param.tf*param.sensor_sample_rate);
+data.WAMV.Y = zeros(param.WAMV.datalength, param.tf*param.sensor_sample_rate);
+data.QUAD.Y = zeros(param.QUAD.datalength, param.tf*param.sensor_sample_rate);
 
 dt = zeros(30,1);                 
 for t = 1:data.MONO.N
     dtt = tic;
-
-    if (param.enabled(1))
-        % Get AUV data
-        [data.AUV.Y(:,t),SR_AUV] = getRawDataAUV(data.AUV.X(:,t), data.AUV.dnu(:,t), data.WAMV.X(1:6,t), param.IMU.gyro_bias);
-        data.AUV.Y(:,t)     = data.AUV.Y(:,t) + SR_AUV*randn(size(SR_AUV,1),1);
+    
+    % Get AUV data
+    [data.AUV.Y(:,t),SR_AUV] = getRawDataAUV(data.AUV.X(:,t), data.AUV.dnu(:,t), data.WAMV.X(1:6,t), param.IMU.gyro_bias);
+    data.AUV.Y(:,t)     = data.AUV.Y(:,t) + SR_AUV*randn(size(SR_AUV,1),1);
 %         data.AUV.IMU(:,t)   = data.AUV.Y(1:9,t);
 %         data.AUV.HAP(:,t)   = data.AUV.Y(10:12,t);
-    end
-    
-    if (param.enabled(2))
-        % Get WAMV data
-        [data.WAMV.Y(:,t),SR_WAMV] = getRawDataWAMV(data.WAMV.X(:,t), data.WAMV.dnu(:,t), param.IMU.gyro_bias);
-        data.WAMV.Y(:,t)  = data.WAMV.Y(:,t) + SR_WAMV*randn(size(SR_WAMV,1),1);
+
+    % Get WAMV data
+    [data.WAMV.Y(:,t),SR_WAMV] = getRawDataWAMV(data.WAMV.X(:,t), data.WAMV.dnu(:,t), param.IMU.gyro_bias);
+    data.WAMV.Y(:,t)  = data.WAMV.Y(:,t) + SR_WAMV*randn(size(SR_WAMV,1),1);
 %         data.WAMV.IMU(:,t)   = data.WAMV.Y(1:9,t);
 %         data.WAMV.GPS(:,t)   = data.WAMV.Y(10:12,t);
 %         vboffset = param.VB.datalength*map.VB.N;
 %         data.WAMV.VB(:,t)    = data.WAMV.Y(13:13+vboffset-1, t);
-    end
-    
-    if (param.enabled(3))
-        % Get QUAD data
-        [data.QUAD.Y(:,t),SR_QUAD] = getRawDataQUAD(data.QUAD.X(:,t), data.QUAD.dnu(:,t), data.WAMV.X(1:6,t), param.IMU.gyro_bias);
-        data.QUAD.Y(:,t)  = data.QUAD.Y(:,t) + SR_QUAD*randn(size(SR_QUAD,1),1);
+
+    % Get QUAD data
+    [data.QUAD.Y(:,t),SR_QUAD] = getRawDataQUAD(data.QUAD.X(:,t), data.QUAD.dnu(:,t), data.WAMV.X(1:6,t), param.IMU.gyro_bias);
+    data.QUAD.Y(:,t)  = data.QUAD.Y(:,t) + SR_QUAD*randn(size(SR_QUAD,1),1);
 %         data.QUAD.IMU(:,t)   = data.QUAD.Y(1:9,t);
 %         data.QUAD.GPS(:,t)   = data.QUAD.Y(1:3,t);
 % 
 %         vboffset    = param.VB.datalength*(map.VB.N+1);
 %         lpsoffset   = param.LPS.datalength*(map.LPS.N+1);
 
-        %data.QUAD.VB(:,t)    = data.QUAD.Y(13:13+vboffset-1, t);
-        %data.QUAD.LPS(:,t)   = data.QUAD.Y(13+vboffset:13+vboffset+lpsoffset-1, t);
-    end
+    %data.QUAD.VB(:,t)    = data.QUAD.Y(13:13+vboffset-1, t);
+    %data.QUAD.LPS(:,t)   = data.QUAD.Y(13+vboffset:13+vboffset+lpsoffset-1, t);
     
     % TTF
     dt(1:29) = dt(2:30);
@@ -169,9 +166,9 @@ for t = 1:data.MONO.N
 end
 
 %% KALMAN FILTER THE FUCK OUT OF SHIT
-Mono_Sub_switch = 2;            % 0 = Sub 1 = Mono;  2 = both/compare
+mono_sub_switch = 2;            % 0 = Sub 1 = Mono;  2 = both/compare
 
-if Mono_Sub_switch ~= 0 && Mono_Sub_switch ~= 1 && Mono_Sub_switch ~= 2
+if mono_sub_switch ~= 0 && mono_sub_switch ~= 1 && mono_sub_switch ~= 2
     error('mono_sub_switch must be 0, 1, or 2, dumbass');
 end
 
@@ -182,88 +179,98 @@ p = size(data.AUV.U,1) + size(data.WAMV.U,1) + size(data.QUAD.U,1);
 
 data.MONO.Y = [data.AUV.Y;data.WAMV.Y;data.QUAD.Y];
 data.MONO.U = [data.AUV.U;data.WAMV.U;data.QUAD.U];
-data.MONO.U = [zeros(p, 1), data.MONO.U];
 
 % Initialise space for estimated means and covariances
-% data.AUV.Xf  = zeros(12, N+1); % Prior and Posterior states (mup(:,t) = prior, mup(:,t+1) = posterior)
-% data.WAMV.Xf = zeros(12, N+1); % Prior and Posterior states (mup(:,t) = prior, mup(:,t+1) = posterior)
-% data.QUAD.Xf = zeros(12, N+1); % Prior and Posterior states (mup(:,t) = prior, mup(:,t+1) = posterior)
+data.AUV.Xf  = zeros(21, N+1); % Prior and Posterior states (mup(:,t) = prior, mup(:,t+1) = posterior)
+data.WAMV.Xf = zeros(15, N+1); % Prior and Posterior states (mup(:,t) = prior, mup(:,t+1) = posterior)
+data.QUAD.Xf = zeros(21, N+1); % Prior and Posterior states (mup(:,t) = prior, mup(:,t+1) = posterior)
 
-data.AUV.gyrobias  = zeros(3, N+1);
-data.WAMV.gyrobias = zeros(3, N+1);
-data.QUAD.gyrobias = zeros(3, N+1);
-
-data.AUV.SPf   = zeros(12,12,N+1);  % Prior and Posterior Squareroot Covariances
-data.WAMV.SPf  = zeros(12,12,N+1);  % Prior and Posterior Squareroot Covariances
-data.QUAD.SPf  = zeros(12,12,N+1);  % Prior and Posterior Squareroot Covariances
-
-data.AUV.SPbias   = zeros(3,3,N+1);  % Prior and Posterior Squareroot Covariances
-data.WAMV.SPbias  = zeros(3,3,N+1);  % Prior and Posterior Squareroot Covariances
-data.QUAD.SPbias  = zeros(3,3,N+1);  % Prior and Posterior Squareroot Covariances
+data.AUV.SPf   = zeros(21,21,N+1);  % Prior and Posterior Squareroot Covariances
+data.WAMV.SPf  = zeros(15,15,N+1);  % Prior and Posterior Squareroot Covariances
+data.QUAD.SPf  = zeros(21,21,N+1);  % Prior and Posterior Squareroot Covariances
 
 data.MONO.Xf    = zeros(n, N+1); % Mean Filtered states
 data.MONO.SPf   = zeros(n,n,N+1);  % Prior and Posterior Squareroot Covariances
 
 % Set initial values
-% if (param.enabled(1)); data.AUV.SPf(:,:,1)  = 2*blkdiag(param.AUV.SQeta, param.AUV.SQnu);   data.AUV.SPbias(:,:,1)  = param.IMU.SQbias; end
-% if (param.enabled(2)); data.WAMV.SPf(:,:,1) = 2*blkdiag(param.WAMV.SQeta, param.WAMV.SQnu); data.WAMV.SPbias(:,:,1) = param.IMU.SQbias; end
-% if (param.enabled(3)); data.QUAD.SPf(:,:,1) = 2*blkdiag(param.QUAD.SQeta, param.QUAD.SQnu); data.QUAD.SPbias(:,:,1) = param.IMU.SQbias; end
-data.MONO.SPf(:,:,1)     = 1e-3*blkdiag(param.AUV.SQeta, param.AUV.SQnu, ...
-                                    param.WAMV.SQeta, param.WAMV.SQnu, ...
-                                    param.QUAD.SQeta, param.QUAD.SQnu, ...
-                                    param.IMU.SQbias0, param.IMU.SQbias0, param.IMU.SQbias0);
+data.MONO.SPf(:,:,1)    = 1e-3*blkdiag(param.AUV.SQeta, param.AUV.SQnu, param.IMU.SQbias0, ...
+                                    param.WAMV.SQeta, param.WAMV.SQnu, param.IMU.SQbias0, ...
+                                    param.QUAD.SQeta, param.QUAD.SQnu, param.IMU.SQbias0);
+                                
+data.AUV.SPf(:,:,1)      = 1e-3*blkdiag(param.AUV.SQeta, param.AUV.SQnu, ...
+                                        param.IMU.SQbias0, param.WAMV.SQeta);
+data.WAMV.SPf(:,:,1)     = 1e-3*blkdiag(param.WAMV.SQeta, param.WAMV.SQnu, ...
+                                        param.IMU.SQbias0);
+data.QUAD.SPf(:,:,1)     = 1e-3*blkdiag(param.QUAD.SQeta, param.QUAD.SQnu, ...
+                                        param.IMU.SQbias0, param.WAMV.SQeta);
 
-% if Mono_Sub_switch == 0     %if running sub estimators, initialise sub SPf
-%     if (param.enabled(1)); data.AUV.SPf(:,:,1)  = 2*blkdiag(param.AUV.SQeta, param.AUV.SQnu);   data.AUV.SPbias(:,:,1)  = param.IMU.SQbias; end
-%     if (param.enabled(2)); data.WAMV.SPf(:,:,1) = 2*blkdiag(param.WAMV.SQeta, param.WAMV.SQnu); data.WAMV.SPbias(:,:,1) = param.IMU.SQbias; end
-%     if (param.enabled(3)); data.QUAD.SPf(:,:,1) = 2*blkdiag(param.QUAD.SQeta, param.QUAD.SQnu); data.QUAD.SPbias(:,:,1) = param.IMU.SQbias; end
-%     Sp_prior = zeros(n,n,3);    Mu_prior = zeros(n,3);
-% 
-% end      
-data_dist = data;   data_mono = data;
 
 for t = 1:data.MONO.N
     dtt = tic;
-    if Mono_Sub_switch ~= 0 && Mono_Sub_switch ~= 1 && Mono_Sub_switch ~= 2
+    if mono_sub_switch ~= 0 && mono_sub_switch ~= 1 && mono_sub_switch ~= 2
         error('shits fucked');
     end
 
-    if Mono_Sub_switch == 0 || Mono_Sub_switch == 2    % Sub estimator stuff 
-        Mono_Sub_switch_mu = 0;
-        Mu_prior(:,1) = data_dist.MONO.Xf(:,t);      Mu_prior(:,2) = data_dist.MONO.Xf(:,t);      Mu_prior(:,3) = data_dist.MONO.Xf(:,t);
-        Sp_prior(:,:,1) = data_dist.MONO.SPf(:,:,t);  Sp_prior(:,:,2) = data_dist.MONO.SPf(:,:,t);  Sp_prior(:,:,3) = data_dist.MONO.SPf(:,:,t);
-
-        f =  @(x,u) mm_auv([data_dist.MONO.Xf(1:12,t); data_dist.MONO.Xf(13:24,t); data_dist.AUV.gyrobias(:,t)], data_dist.AUV.U(:,t));
-        [Temp_prior_Mu, Temp_prior_Sp]     = UKF_MU(data_dist.AUV.Y(:,t), [data_dist.MONO.Xf(1:12,t); data_dist.MONO.Xf(37:39,t); data_dist.MONO.Xf(13:18,t)], blkdiag(data_dist.MONO.SPf(1:12,1:12,t),data_dist.MONO.SPf(37:39,37:39,t)), data_dist.AUV.U(:,t),f,Mono_Sub_switch_mu);
-        Mu_prior(1:12,1) = Temp_prior_Mu(1:12);	Mu_prior(37:39,1) = Temp_prior_Mu(13:15);  Sp_prior(1:12,1:12,1) = Temp_prior_Sp(1:12,1:12);   Sp_prior(37:39,37:39,1) = Temp_prior_Sp(13:15,13:15);
-
-        f =  @(x,u) mm_wamv([data_dist.MONO.Xf(13:24,t); data_dist.MONO.Xf(40:42,t)], data_dist.WAMV.U(:,t));
-        [Temp_prior_Mu, Temp_prior_Sp]     = UKF_MU(data_dist.WAMV.Y(:,t), [data_dist.MONO.Xf(13:24,t); data_dist.MONO.Xf(40:42,t)], blkdiag(data_dist.MONO.SPf(13:24,13:24,t),data_dist.MONO.SPf(40:42,40:42,t)), data_dist.WAMV.U(:,t),f,Mono_Sub_switch_mu);        %QUAD MU
-        Mu_prior(13:24,2) = Temp_prior_Mu(1:12); Mu_prior(40:42,2) = Temp_prior_Mu(13:15); Sp_prior(13:24,13:24,2) = Temp_prior_Sp(1:12,1:12); Sp_prior(40:42,40:42,2) = Temp_prior_Sp(13:15,13:15);
-
-        f =  @(x,u) mm_quad([data_dist.MONO.Xf(25:36,t);data_dist.MONO.Xf(43:45,t); data_dist.MONO.Xf(13:18,t)],data_dist.QUAD.U(:,t));
-        [Temp_prior_Mu, Temp_prior_Sp]     = UKF_MU(data_dist.QUAD.Y(:,t), [data_dist.MONO.Xf(25:36,t);data_dist.MONO.Xf(43:45,t); data_dist.MONO.Xf(13:18,t)],  blkdiag(data_dist.MONO.SPf(25:36,25:36,t),data_dist.MONO.SPf(43:45,43:45,t)), data_dist.QUAD.U(:,t),f,Mono_Sub_switch_mu);        %QUAD MU
-        Mu_prior(25:36,3) = Temp_prior_Mu(1:12); Mu_prior(43:45,3) = Temp_prior_Mu(13:15); Sp_prior(25:36,25:36,3) = Temp_prior_Sp(1:12,1:12); Sp_prior(43:45,43:45,3) = Temp_prior_Sp(13:15,13:15);
-
-        data_dist.MONO.SPf(:,:,t) = inv(inv(Sp_prior(:,:,1)) + inv(Sp_prior(:,:,2)) + inv(Sp_prior(:,:,3)) - 2*inv(data_dist.MONO.SPf(:,:,t)));
-        data_dist.MONO.Xf(:,t) = data_dist.MONO.SPf(:,:,t)*(Sp_prior(:,:,1)\Mu_prior(:,1) + Sp_prior(:,:,2)\Mu_prior(:,2) + Sp_prior(:,:,3)\Mu_prior(:,3) - 2*inv(data_dist.MONO.SPf(:,:,t))*data_dist.MONO.Xf(:,t));
+    if mono_sub_switch == 0 || mono_sub_switch == 2    % Sub estimator stuff 
+        Xmono_pri  = [data.AUV.Xf(1:15,t);
+                      data.WAMV.Xf(1:15,t);
+                      data.QUAD.Xf(1:15,t)];
+                  
+        SPmono_pri = blkdiag(data.AUV.SPf(1:15,1:15,t), ...
+                             data.WAMV.SPf(1:15,1:15,t), ...
+                             data.QUAD.SPf(1:15,1:15,t));
+        
+        % AUV Estimator
+        g_auv = @(x,u) mm_auv(x(1:12), u, x(13:15), x(16:21));      % AUV States: [AUV_eta; AUV_nu; AUV_gyrobias; WAMV_eta];
+        [data.AUV.Xf(:,t), data.AUV.SPf(:,:,t)] = UKF_MU(data.AUV.Y(:,t), data.AUV.Xf(:,t), data.AUV.SPf(:,:,t), data.AUV.U(:,t), g_auv);
+        
+        % WAMV Estimator
+        g_wamv = @(x,u) mm_wamv(x(1:12), u, x(13:15));              % WAMV States: [WAMV_eta; WAMV_nu; WAMV_gyrobias];
+        [data.WAMV.Xf(:,t), data.WAMV.SPf(:,:,t)] = UKF_MU(data.WAMV.Y(:,t), data.WAMV.Xf(:,t), data.WAMV.SPf(:,:,t), data.WAMV.U(:,t), g_wamv);
+        
+        % QUAD Estimator
+        g_quad = @(x,u) mm_quad(x(1:12), u, x(13:15), x(16:21));    % QUAD States: [QUAD_eta; QUAD_nu; QUAD_gyrobias; WAMV_eta];
+        [data.QUAD.Xf(:,t), data.QUAD.SPf(:,:,t)] = UKF_MU(data.QUAD.Y(:,t), data.QUAD.Xf(:,t), data.QUAD.SPf(:,:,t), data.QUAD.U(:,t), g_quad);
+        
+        % Reassemble into full state for merge (This step can hapen
+        % individually on each vehicle)
+        % AUV Reassembly
+        Xfm_auv = Xmono_pri;                            SPfm_auv = SPmono_pri;
+        Xfm_auv([1:15, 16:21]) = data.AUV.Xf(:,t);      SPfm_auv([1:15,16:21],[1:15,16:21]) = data.AUV.SPf(:,:,t);
+        
+        % WAMV Reassembly
+        Xfm_wamv = Xmono_pri;                    SPfm_wamv = SPmono_pri;
+        Xfm_wamv(16:30) = data.WAMV.Xf(:,t);     SPfm_wamv(16:30,16:30) = data.WAMV.SPf(:,:,t);
+        
+        % QUAD Reassembly
+        Xfm_quad = Xmono_pri;                            SPfm_quad = SPmono_pri;
+        Xfm_quad([31:45, 16:21]) = data.QUAD.Xf(:,t);    SPfm_quad([31:45,16:21],[31:45,16:21]) = data.QUAD.SPf(:,:,t);
+        
+        % THIS IS WHERE "DISTRIBUTION OF THE STATES" can occur
+        
+        % Merge AUV/WAMV/QUAD Estimators (Can happen individually on each
+        % vehicle)
+        SPf_mono = inv(inv(SPfm_auv) + inv(SPfm_wamv) + inv(SPfm_quad) - 2*inv(SPmono_pri));
+        Xf_mono = SPf_mono*(SPfm_auv\Xfm_auv + SPfm_wamv\Xfm_wamv + SPfm_quad\Xfm_quad - 2*(SPmono_pri\Xmono_pri));
 
         % UKF_PU
         f = @(x,u) pm_mono(x,u);
-        [data_dist.MONO.Xf(:,t+1), data_dist.MONO.SPf(:,:,t+1)] = UKF_PU(data_dist.MONO.Xf(:,t), data_dist.MONO.SPf(:,:,t), data_dist.MONO.U(:,t+1), f);
+        [Xf_mono, SPf_mono] = UKF_PU(Xf_mono, SPf_mono, [data.AUV.U(:,t);data.WAMV.U(:,t);data.QUAD.U(:,t)], f);
 
+        % Full state disassembly
+        data.AUV.Xf(:,t+1)  = Xf_mono([1:15, 16:21]);    data.AUV. SPf(:,:,t+1) = SPf_mono([1:15,16:21],[1:15,16:21]);
+        data.WAMV.Xf(:,t+1) = Xf_mono(16:30);            data.WAMV.SPf(:,:,t+1) = SPf_mono(16:30,16:30);
+        data.QUAD.Xf(:,t+1) = Xf_mono([31:45, 16:21]);   data.QUAD.SPf(:,:,t+1) = SPf_mono([31:45,16:21],[31:45,16:21]);
     end
 
-    if Mono_Sub_switch == 1 || Mono_Sub_switch == 2 % Mono stuff   
-        Mono_Sub_switch_mu = 1;
-    
+    if mono_sub_switch == 1 || mono_sub_switch == 2 % Mono stuff   
         %     Measurement update - Monolithic
         g = @(x,u) mm_mono(x, u);
-        [data_mono.MONO.Xf(:,t), data_mono.MONO.SPf(:,:,t)]     = UKF_MU(data_mono.MONO.Y(:,t), data_mono.MONO.Xf(:,t), data_mono.MONO.SPf(:,:,t), data_mono.MONO.U(:,t), g,Mono_Sub_switch_mu);
+        [data.MONO.Xf(:,t), data.MONO.SPf(:,:,t)]     = UKF_MU(data.MONO.Y(:,t), data.MONO.Xf(:,t), data.MONO.SPf(:,:,t), data.MONO.U(:,t), g);
     
         %     Process Update - Monolithic
         f = @(x,u) pm_mono(x,u);
-        [data_mono.MONO.Xf(:,t+1), data_mono.MONO.SPf(:,:,t+1)] = UKF_PU(data_mono.MONO.Xf(:,t), data_mono.MONO.SPf(:,:,t), data_mono.MONO.U(:,t+1), f);
+        [data.MONO.Xf(:,t+1), data.MONO.SPf(:,:,t+1)] = UKF_PU(data.MONO.Xf(:,t), data.MONO.SPf(:,:,t), data.MONO.U(:,t+1), f);
     end
     
     % TTF
@@ -274,31 +281,13 @@ for t = 1:data.MONO.N
 end
 
 %% Resize and separate filtered data
-data.MONO.Xf = data.MONO.Xf(:,1:end-1);
+data.MONO.Xf  = data.MONO.Xf(:,1:end-1);
+data.AUV.Xf   = data.AUV.Xf(:,1:end-1);
+data.WAMV.Xf  = data.WAMV.Xf(:,1:end-1);
+data.QUAD.Xf  = data.QUAD.Xf(:,1:end-1);
+
 %%
-% data.AUV.Xf = data.MONO.Xf(1:12,:);
-% data.WAMV.Xf = data.MONO.Xf(13:24,:);
-% data.QUAD.Xf = data.MONO.Xf(25:36,:);
-% 
-% data.AUV.gyrobias = data.MONO.Xf(37:39,:);
-% data.WAMV.gyrobias = data.MONO.Xf(40:42,:);
-% data.QUAD.gyrobias = data.MONO.Xf(43:45,:);
 
-if Mono_Sub_switch == 0 || Mono_Sub_switch == 2% dist stuff   
-    data_dist.MONO.Xf = data_dist.MONO.Xf(:,1:end-1);
-    data_dist.AUV.Xf = data_dist.MONO.Xf(1:12,:);
-    data_dist.WAMV.Xf = data_dist.MONO.Xf(13:24,:);
-    data_dist.QUAD.Xf = data_dist.MONO.Xf(25:36,:);
-end
+PlotData(data, mono_sub_switch);
 
-if Mono_Sub_switch == 1 || Mono_Sub_switch == 2% Mono stuff   
-    data_mono.MONO.Xf = data_mono.MONO.Xf(:,1:end-1);
-    data_mono.AUV.Xf = data_mono.MONO.Xf(1:12,:);
-    data_mono.WAMV.Xf = data_mono.MONO.Xf(13:24,:);
-    data_mono.QUAD.Xf = data_mono.MONO.Xf(25:36,:);
-end
-%%
-close all
-PlotData(data_dist,data_mono,Mono_Sub_switch);
-
-clearvars -except data_dist data_mono param map 
+clearvars -except data param map 
