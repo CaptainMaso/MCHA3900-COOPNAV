@@ -5,8 +5,6 @@ global param
 %in(13:18) -> dnu
 
 eta = in(1:6);
-nu = in(7:12);
-dnu = in(13:18);
 
 y_gps = [eta(1);eta(2);eta(3)];
 

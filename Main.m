@@ -73,7 +73,7 @@ param.QUAD.datalength = param.IMU.datalength + ...
                         param.GPS.datalength + ...
                         param.VB.datalength*(map.VB.N+1) + ...
                         param.LPS.datalength*(map.LPS.N+1);
-
+param.maxDelay = 4;
 %% Get Vehicle Data
 %% -- AUV data
 if (param.enabled(1))
@@ -122,156 +122,157 @@ data.MONO.N = data.AUV.N;
 data.t = data.AUV.t;
 
 %% Simulate Sensor Data
-
 % Get all Data
-data.AUV.Y  = zeros(param.AUV.datalength,  param.tf*param.sensor_sample_rate);
-data.WAMV.Y = zeros(param.WAMV.datalength, param.tf*param.sensor_sample_rate);
-data.QUAD.Y = zeros(param.QUAD.datalength, param.tf*param.sensor_sample_rate);
-
-dt = zeros(30,1);                 
-for t = 1:data.MONO.N
-    dtt = tic;
-    
-    % Get AUV data
-    [data.AUV.Y(:,t),SR_AUV] = getRawDataAUV(data.AUV.X(:,t), data.AUV.dnu(:,t), data.WAMV.X(1:6,t), param.IMU.gyro_bias);
-    data.AUV.Y(:,t)     = data.AUV.Y(:,t) + SR_AUV*randn(size(SR_AUV,1),1);
-%         data.AUV.IMU(:,t)   = data.AUV.Y(1:9,t);
-%         data.AUV.HAP(:,t)   = data.AUV.Y(10:12,t);
-
-    % Get WAMV data
-    [data.WAMV.Y(:,t),SR_WAMV] = getRawDataWAMV(data.WAMV.X(:,t), data.WAMV.dnu(:,t), param.IMU.gyro_bias);
-    data.WAMV.Y(:,t)  = data.WAMV.Y(:,t) + SR_WAMV*randn(size(SR_WAMV,1),1);
-%         data.WAMV.IMU(:,t)   = data.WAMV.Y(1:9,t);
-%         data.WAMV.GPS(:,t)   = data.WAMV.Y(10:12,t);
-%         vboffset = param.VB.datalength*map.VB.N;
-%         data.WAMV.VB(:,t)    = data.WAMV.Y(13:13+vboffset-1, t);
-
-    % Get QUAD data
-    [data.QUAD.Y(:,t),SR_QUAD] = getRawDataQUAD(data.QUAD.X(:,t), data.QUAD.dnu(:,t), data.WAMV.X(1:6,t), param.IMU.gyro_bias);
-    data.QUAD.Y(:,t)  = data.QUAD.Y(:,t) + SR_QUAD*randn(size(SR_QUAD,1),1);
-%         data.QUAD.IMU(:,t)   = data.QUAD.Y(1:9,t);
-%         data.QUAD.GPS(:,t)   = data.QUAD.Y(1:3,t);
-% 
-%         vboffset    = param.VB.datalength*(map.VB.N+1);
-%         lpsoffset   = param.LPS.datalength*(map.LPS.N+1);
-
-    %data.QUAD.VB(:,t)    = data.QUAD.Y(13:13+vboffset-1, t);
-    %data.QUAD.LPS(:,t)   = data.QUAD.Y(13+vboffset:13+vboffset+lpsoffset-1, t);
-    
-    % TTF
-    dt(1:29) = dt(2:30);
-    dt(30) = toc(dtt);
-    ttf = degrees2dm(sum(dt)/sum(dt ~= 0)*(data.MONO.N - t)/60);
-    disp(['ETA data gen: ' num2str(ttf(1), '%.0f') 'm ' num2str(ttf(2), '%.2f') 's'])
-end
+DelayedMeasurements();
 
 %% KALMAN FILTER THE FUCK OUT OF SHIT
-mono_sub_switch = 2;            % 0 = Sub 1 = Mono;  2 = both/compare
-
-if mono_sub_switch ~= 0 && mono_sub_switch ~= 1 && mono_sub_switch ~= 2
-    error('mono_sub_switch must be 0, 1, or 2, dumbass');
-end
-
 N = size(data.QUAD.Y,2);     % Length of data
 n = size(data.AUV.X,1) + size(data.WAMV.X,1) + size(data.QUAD.X,1) + 9;
 m = size(data.AUV.Y,1) + size(data.WAMV.Y,1) + size(data.QUAD.Y,1);
 p = size(data.AUV.U,1) + size(data.WAMV.U,1) + size(data.QUAD.U,1);
 
-data.MONO.Y = [data.AUV.Y;data.WAMV.Y;data.QUAD.Y];
-data.MONO.U = [data.AUV.U;data.WAMV.U;data.QUAD.U];
-
 % Initialise space for estimated means and covariances
-data.AUV.Xf  = zeros(21, N+1); % Prior and Posterior states (mup(:,t) = prior, mup(:,t+1) = posterior)
-data.WAMV.Xf = zeros(15, N+1); % Prior and Posterior states (mup(:,t) = prior, mup(:,t+1) = posterior)
-data.QUAD.Xf = zeros(21, N+1); % Prior and Posterior states (mup(:,t) = prior, mup(:,t+1) = posterior)
+data.AUV.Xf  = zeros(21*param.maxDelay, N+1); % Prior and Posterior states (mup(:,t) = prior, mup(:,t+1) = posterior)
+data.WAMV.Xf = zeros(15*param.maxDelay, N+1); % Prior and Posterior states (mup(:,t) = prior, mup(:,t+1) = posterior)
+data.QUAD.Xf = zeros(21*param.maxDelay, N+1); % Prior and Posterior states (mup(:,t) = prior, mup(:,t+1) = posterior)
 
-data.AUV.SPf   = zeros(21,21,N+1);  % Prior and Posterior Squareroot Covariances
-data.WAMV.SPf  = zeros(15,15,N+1);  % Prior and Posterior Squareroot Covariances
-data.QUAD.SPf  = zeros(21,21,N+1);  % Prior and Posterior Squareroot Covariances
-
-data.MONO.Xf    = zeros(n, N+1); % Mean Filtered states
-data.MONO.SPf   = zeros(n,n,N+1);  % Prior and Posterior Squareroot Covariances
+data.AUV.SPf   = zeros(21*param.maxDelay,21*param.maxDelay,N+1);  % Prior and Posterior Squareroot Covariances
+data.WAMV.SPf  = zeros(15*param.maxDelay,15*param.maxDelay,N+1);  % Prior and Posterior Squareroot Covariances
+data.QUAD.SPf  = zeros(21*param.maxDelay,21*param.maxDelay,N+1);  % Prior and Posterior Squareroot Covariances
 
 % Set initial values
-data.MONO.SPf(:,:,1)    = 1e-3*blkdiag(param.AUV.SQeta, param.AUV.SQnu, param.IMU.SQbias0, ...
-                                    param.WAMV.SQeta, param.WAMV.SQnu, param.IMU.SQbias0, ...
-                                    param.QUAD.SQeta, param.QUAD.SQnu, param.IMU.SQbias0);
-                                
-data.AUV.SPf(:,:,1)      = 1e-3*blkdiag(param.AUV.SQeta, param.AUV.SQnu, ...
-                                        param.IMU.SQbias0, param.WAMV.SQeta);
-data.WAMV.SPf(:,:,1)     = 1e-3*blkdiag(param.WAMV.SQeta, param.WAMV.SQnu, ...
-                                        param.IMU.SQbias0);
-data.QUAD.SPf(:,:,1)     = 1e-3*blkdiag(param.QUAD.SQeta, param.QUAD.SQnu, ...
-                                        param.IMU.SQbias0, param.WAMV.SQeta);
-
+for ii = 0:param.maxDelay
+    
+    data.AUV.SPf(1:21,1:21,1)      = 1e-3*blkdiag(param.AUV.SQeta, param.AUV.SQnu, ...
+                                            param.IMU.SQbias0, param.WAMV.SQeta);
+    data.WAMV.SPf(1:15,1:15,1)     = 1e-3*blkdiag(param.WAMV.SQeta, param.WAMV.SQnu, ...
+                                            param.IMU.SQbias0);
+    data.QUAD.SPf(1:21,1:21,1)     = 1e-3*blkdiag(param.QUAD.SQeta, param.QUAD.SQnu, ...
+                                            param.IMU.SQbias0, param.WAMV.SQeta);
+end
 
 for t = 1:data.MONO.N
     dtt = tic;
-    if mono_sub_switch ~= 0 && mono_sub_switch ~= 1 && mono_sub_switch ~= 2
-        error('shits fucked');
-    end
-
-    if mono_sub_switch == 0 || mono_sub_switch == 2    % Sub estimator stuff 
-        Xmono_pri  = [data.AUV.Xf(1:15,t);
-                      data.WAMV.Xf(1:15,t);
-                      data.QUAD.Xf(1:15,t)];
-                  
-        SPmono_pri = blkdiag(data.AUV.SPf(1:15,1:15,t), ...
-                             data.WAMV.SPf(1:15,1:15,t), ...
-                             data.QUAD.SPf(1:15,1:15,t));
-        
-        % AUV Estimator
-        g_auv = @(x,u) mm_auv(x(1:12), u, x(13:15), x(16:21));      % AUV States: [AUV_eta; AUV_nu; AUV_gyrobias; WAMV_eta];
-        [data.AUV.Xf(:,t), data.AUV.SPf(:,:,t)] = UKF_MU(data.AUV.Y(:,t), data.AUV.Xf(:,t), data.AUV.SPf(:,:,t), data.AUV.U(:,t), g_auv);
-        
-        % WAMV Estimator
-        g_wamv = @(x,u) mm_wamv(x(1:12), u, x(13:15));              % WAMV States: [WAMV_eta; WAMV_nu; WAMV_gyrobias];
-        [data.WAMV.Xf(:,t), data.WAMV.SPf(:,:,t)] = UKF_MU(data.WAMV.Y(:,t), data.WAMV.Xf(:,t), data.WAMV.SPf(:,:,t), data.WAMV.U(:,t), g_wamv);
-        
-        % QUAD Estimator
-        g_quad = @(x,u) mm_quad(x(1:12), u, x(13:15), x(16:21));    % QUAD States: [QUAD_eta; QUAD_nu; QUAD_gyrobias; WAMV_eta];
-        [data.QUAD.Xf(:,t), data.QUAD.SPf(:,:,t)] = UKF_MU(data.QUAD.Y(:,t), data.QUAD.Xf(:,t), data.QUAD.SPf(:,:,t), data.QUAD.U(:,t), g_quad);
-        
-        % Reassemble into full state for merge (This step can hapen
-        % individually on each vehicle)
-        % AUV Reassembly
-        Xfm_auv = Xmono_pri;                            SPfm_auv = SPmono_pri;
-        Xfm_auv([1:15, 16:21]) = data.AUV.Xf(:,t);      SPfm_auv([1:15,16:21],[1:15,16:21]) = data.AUV.SPf(:,:,t);
-        
-        % WAMV Reassembly
-        Xfm_wamv = Xmono_pri;                    SPfm_wamv = SPmono_pri;
-        Xfm_wamv(16:30) = data.WAMV.Xf(:,t);     SPfm_wamv(16:30,16:30) = data.WAMV.SPf(:,:,t);
-        
-        % QUAD Reassembly
-        Xfm_quad = Xmono_pri;                            SPfm_quad = SPmono_pri;
-        Xfm_quad([31:45, 16:21]) = data.QUAD.Xf(:,t);    SPfm_quad([31:45,16:21],[31:45,16:21]) = data.QUAD.SPf(:,:,t);
-        
-        % THIS IS WHERE "DISTRIBUTION OF THE STATES" can occur
-        
-        % Merge AUV/WAMV/QUAD Estimators (Can happen individually on each
-        % vehicle)
-        SPf_mono = inv(inv(SPfm_auv) + inv(SPfm_wamv) + inv(SPfm_quad) - 2*inv(SPmono_pri));
-        Xf_mono = SPf_mono*(SPfm_auv\Xfm_auv + SPfm_wamv\Xfm_wamv + SPfm_quad\Xfm_quad - 2*(SPmono_pri\Xmono_pri));
-
-        % UKF_PU
-        f = @(x,u) pm_mono(x,u);
-        [Xf_mono, SPf_mono] = UKF_PU(Xf_mono, SPf_mono, [data.AUV.U(:,t);data.WAMV.U(:,t);data.QUAD.U(:,t)], f);
-
-        % Full state disassembly
-        data.AUV.Xf(:,t+1)  = Xf_mono([1:15, 16:21]);    data.AUV. SPf(:,:,t+1) = SPf_mono([1:15,16:21],[1:15,16:21]);
-        data.WAMV.Xf(:,t+1) = Xf_mono(16:30);            data.WAMV.SPf(:,:,t+1) = SPf_mono(16:30,16:30);
-        data.QUAD.Xf(:,t+1) = Xf_mono([31:45, 16:21]);   data.QUAD.SPf(:,:,t+1) = SPf_mono([31:45,16:21],[31:45,16:21]);
-    end
-
-    if mono_sub_switch == 1 || mono_sub_switch == 2 % Mono stuff   
-        %     Measurement update - Monolithic
-        g = @(x,u) mm_mono(x, u);
-        [data.MONO.Xf(:,t), data.MONO.SPf(:,:,t)]     = UKF_MU(data.MONO.Y(:,t), data.MONO.Xf(:,t), data.MONO.SPf(:,:,t), data.MONO.U(:,t), g);
     
-        %     Process Update - Monolithic
-        f = @(x,u) pm_mono(x,u);
-        [data.MONO.Xf(:,t+1), data.MONO.SPf(:,:,t+1)] = UKF_PU(data.MONO.Xf(:,t), data.MONO.SPf(:,:,t), data.MONO.U(:,t+1), f);
+    Xmono_pri  = nan(n*param.maxDelay,1);
+    SPmono_pri = zeros(n*param.maxDelay,n*param.maxDelay);
+    
+    for ii = 0:param.maxDelay-1
+        Xmono_pri((1:45) + ii*45)  = [data.AUV.Xf((1:15) + ii*21,t);
+                                      data.WAMV.Xf((1:15) + ii*15,t);
+                                      data.QUAD.Xf((1:15) + ii*21,t)];
+
+        SPmono_pri((1:45) + ii*45, (1:45) + ii*45) = blkdiag(data.AUV.SPf((1:15) + ii*21,(1:15) + ii*21,t), ...
+                                                             data.WAMV.SPf((1:15) + ii*15,(1:15) + ii*15,t), ...
+                                                             data.QUAD.SPf((1:15) + ii*21,(1:15) + ii*21,t));
     end
+    
+    for ii = 1:cellCounter(t)
+       k_n = t - Ydelay{ii,t}.timeStamp;
+       if (k_n < param.maxDelay)
+           switch (Ydelay{ii,t}.type)
+               % AUV Measurement Corrections
+               case "AUV IMU"
+                    asv = (1:21) + (k_n*21); % Active State Vector
+                    g_auv_imu = @(x,u) mm_AUV_IMU(x(1:12), u, x(13:15), x(16:21));            % AUV States: [AUV_eta; AUV_nu; AUV_gyrobias; WAMV_eta];
+                    [data.AUV.Xf(asv,t), data.AUV.SPf(asv,asv,t)]   = UKF_MU(Ydelay{ii,t}.data, data.AUV.Xf(asv,t), ...
+                                                                             data.AUV.SPf(asv,asv,t), data.AUV.U(:,t-k_n), g_auv_imu);                                       
+               case "AUV HAP"
+                    asv = (1:21) + (k_n*21); % Active State Vector
+                    g_auv_hap = @(x,u) mm_AUV_HAP(x(1:12), u, x(13:15), x(16:21));               % AUV States: [AUV_eta; AUV_nu; AUV_gyrobias; WAMV_eta];
+                    [data.AUV.Xf(asv,t), data.AUV.SPf(asv,asv,t)]   = UKF_MU(Ydelay{ii,t}.data, data.AUV.Xf(asv,t), ...
+                                                                             data.AUV.SPf(asv,asv,t), data.AUV.U(:,t-k_n), g_auv_hap);
+               % WAMV Measurement Corrections
+               case "WAMV IMU"
+                   asv = (1:15) + (k_n*15); % Active State Vector
+                   g_wamv_imu = @(x,u) mm_WAMV_IMU(x(1:12), u, x(13:15));               % WAMV States: [WAMV_eta; WAMV_nu; WAMV_gyrobias];
+                   [data.WAMV.Xf(asv,t), data.WAMV.SPf(asv,asv,t)]  = UKF_MU(Ydelay{ii,t}.data, data.WAMV.Xf(asv,t), ...
+                                                                             data.WAMV.SPf(asv,asv,t), data.WAMV.U(:,t-k_n), g_wamv_imu);
+               case "WAMV GPS"
+                   asv = (1:15) + (k_n*15); % Active State Vector
+                   g_wamv_gps = @(x,u) mm_WAMV_GPS(x(1:12), u, x(13:15));               % WAMV States: [WAMV_eta; WAMV_nu; WAMV_gyrobias];
+                   [data.WAMV.Xf(asv,t), data.WAMV.SPf(asv,asv,t)]  = UKF_MU(Ydelay{ii,t}.data, data.WAMV.Xf(asv,t), ...
+                                                                             data.WAMV.SPf(asv,asv,t), data.WAMV.U(:,t-k_n), g_wamv_gps);
+               case "WAMV VB"
+                    asv = (1:15) + (k_n*15); % Active State Vector
+                    g_wamv_vb = @(x,u) mm_WAMV_VB(x(1:12), u, x(13:15));               % WAMV States: [WAMV_eta; WAMV_nu; WAMV_gyrobias];
+                    [data.WAMV.Xf(asv,t), data.WAMV.SPf(asv,asv,t)]  = UKF_MU(Ydelay{ii,t}.data, data.WAMV.Xf(asv,t), ...
+                                                                             data.WAMV.SPf(asv,asv,t), data.WAMV.U(:,t-k_n), g_wamv_vb);
+               % QUAD Measurement Corrections
+               case "QUAD IMU"
+                    asv = (1:21) + (k_n*21); % Active State Vector
+                    g_quad_imu = @(x,u) mm_QUAD_IMU(x(1:12), u, x(13:15), x(16:21));    % QUAD States: [QUAD_eta; QUAD_nu; QUAD_gyrobias; WAMV_eta];
+                    [data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t)] = UKF_MU(Ydelay{ii,t}.data, data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t), data.QUAD.U(:,t-k_n), g_quad_imu);
+
+               case "QUAD GPS"
+                    asv = (1:21) + (k_n*21); % Active State Vector
+                    g_quad_gps = @(x,u) mm_QUAD_GPS(x(1:12), u, x(13:15), x(16:21));    % QUAD States: [QUAD_eta; QUAD_nu; QUAD_gyrobias; WAMV_eta];
+                    [data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t)] = UKF_MU(Ydelay{ii,t}.data, data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t), data.QUAD.U(:,t-k_n), g_quad_gps);
+
+               case "QUAD VB"
+                   asv = (1:21) + (k_n*21); % Active State Vector
+                   g_quad_vb = @(x,u) mm_QUAD_VB(x(1:12), u, x(13:15), x(16:21));    % QUAD States: [QUAD_eta; QUAD_nu; QUAD_gyrobias; WAMV_eta];
+                   [data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t)] = UKF_MU(Ydelay{ii,t}.data, data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t), data.QUAD.U(:,t-k_n), g_quad_vb);
+
+               case "QUAD LPS"
+                   asv = (1:21) + (k_n*21); % Active State Vector
+                   g_quad_lps = @(x,u) mm_QUAD_LPS(x(1:12), u, x(13:15), x(16:21));    % QUAD States: [QUAD_eta; QUAD_nu; QUAD_gyrobias; WAMV_eta];
+                   [data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t)] = UKF_MU(Ydelay{ii,t}.data, data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t), data.QUAD.U(:,t-k_n), g_quad_lps);
+
+               otherwise
+                   error('Who the fuck wrote this code');
+           end
+       end
+    end
+    
+    Xf_mono     = Xmono_pri;
+    SPf_mono    = SPmono_pri;
+    
+    for ii = 0:param.maxDelay-1
+        Xfm_auv  = Xmono_pri((1:45) + ii*45);           SPfm_auv  = SPmono_pri((1:45) + ii*45, (1:45) + ii*45);
+        Xfm_wamv = Xmono_pri((1:45) + ii*45);           SPfm_wamv = SPmono_pri((1:45) + ii*45, (1:45) + ii*45);
+        Xfm_quad = Xmono_pri((1:45) + ii*45);           SPfm_quad = SPmono_pri((1:45) + ii*45, (1:45) + ii*45);
+        
+        if (rank(SPfm_auv) == size(SPfm_auv,1) && rank(SPfm_wamv) == size(SPfm_wamv,1) && rank(SPfm_quad) == size(SPfm_quad,1))
+            % Reassemble into full state for merge (This step can hapen
+            % individually on each vehicle)
+            % AUV Reassembly
+            Xfm_auv([1:15, 16:21])              = data.AUV.Xf((1:21) + ii*21,t);
+            SPfm_auv([1:15,16:21],[1:15,16:21]) = data.AUV.SPf([1:15,16:21] + ii*21,[1:15,16:21] + ii*21,t);
+
+            % WAMV Reassembly
+            Xfm_wamv(16:30)         = data.WAMV.Xf((1:15) + ii*15,t);     
+            SPfm_wamv(16:30,16:30)  = data.WAMV.SPf((1:15) + ii*15,(1:15) + ii*15,t);
+
+            % QUAD Reassembly
+            Xfm_quad([31:45, 16:21]) = data.QUAD.Xf((1:21) + ii*21,t);
+            SPfm_quad([31:45,16:21],[31:45,16:21]) = data.QUAD.SPf((1:21) + ii*21, (1:21) + ii*21, t);
+
+            % THIS IS WHERE "DISTRIBUTION OF THE STATES" can occur
+            % Merge AUV/WAMV/QUAD Estimators (Can happen individually on each
+            % vehicle)
+            SPf_mono((1:45) + ii*45, (1:45) + ii*45)    = inv(inv(SPfm_auv) + inv(SPfm_wamv) + inv(SPfm_quad)...
+                                                              - 2*inv(SPmono_pri((1:45) + ii*45, (1:45) + ii*45)));
+                                                          
+            Xf_mono((1:45) + ii*45)     = SPf_mono((1:45) + ii*45, (1:45) + ii*45)...
+                                          *(SPfm_auv\Xfm_auv + SPfm_wamv\Xfm_wamv + SPfm_quad\Xfm_quad...
+                                          - 2*(SPmono_pri((1:45) + ii*45, (1:45) + ii*45))\Xmono_pri((1:45) + ii*45));
+        end
+    end
+    
+    % UKF_PU
+    f = @(x,u) pm_mono_oosm(x,u);
+    [Xf_mono, SPf_mono] = UKF_PU(Xf_mono, SPf_mono, [data.AUV.U(:,t);data.WAMV.U(:,t);data.QUAD.U(:,t)], f);
+
+    % Full state disassembly
+    data.AUV.Xf([1:15, 16:21] + ii*21,t+1)                          = Xf_mono([1:15, 16:21] + ii*45);    
+    data.AUV.SPf([1:15, 16:21] + ii*21, [1:15, 16:21] + ii*21,t+1)  = SPf_mono([1:15,16:21] + ii*45,[1:15,16:21] + ii*45);
+
+    data.WAMV.Xf((1:15) + ii*15, t+1)                   = Xf_mono((16:30) + ii*45);            
+    data.WAMV.SPf((1:15) + ii*15,(1:15) + ii*15, t+1)   = SPf_mono((16:30) + ii*45,(16:30) + ii*45);
+
+    data.QUAD.Xf([1:15, 16:21] + ii*21,t+1)                         = Xf_mono([31:45, 16:21]  + ii*45);   
+    data.QUAD.SPf([1:15, 16:21] + ii*21,[1:15, 16:21] + ii*21, t+1) = SPf_mono([31:45,16:21]  + ii*45, [31:45,16:21]  + ii*45);
     
     % TTF
     dt(1:29) = dt(2:30);
@@ -288,6 +289,6 @@ data.QUAD.Xf  = data.QUAD.Xf(:,1:end-1);
 
 %%
 
-PlotData(data, mono_sub_switch);
+PlotData(data);
 
 clearvars -except data param map 

@@ -1,4 +1,4 @@
-function PlotData(data, mono_sub_switch)
+function PlotData(data)
 global param
 % Plot states (True, est. mono, est. distributed)
 % ETA data
@@ -15,31 +15,13 @@ if (param.enabled(1))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + 1);
-        if mono_sub_switch == 0
-            plot(data.t, data.AUV.X(row,:)*scales(row), data.t, data.AUV.Xf(row,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Distributed');
-        elseif mono_sub_switch == 1
-            plot(data.t, data.AUV.X(row,:)*scales(row), data.t, data.MONO.Xf(row,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Monolithic');
-        elseif mono_sub_switch == 2
-            plot(data.t, data.AUV.X(row,:)*scales(row), data.t, data.AUV.Xf(row,:)*scales(row),data.t, data.MONO.Xf(row,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
-        end
+        plot(data.t, data.AUV.X(row,:)*scales(row), data.t, data.AUV.Xf(row,:)*scales(row));
+        grid on;
+        t = titles(row);
+        title(t{:}, 'Interpreter', 'latex');
+        ylabel(ylabels(row), 'Interpreter', 'latex');
+        xlabel(xlabels(row), 'Interpreter', 'latex');
+        legend('True', 'Filtered - Distributed');
     end
 end
 
@@ -51,7 +33,6 @@ if (param.enabled(2))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + sum(param.enabled(1:2)));
-        if mono_sub_switch == 0
             plot(data.t, data.WAMV.X(row,:)*scales(row), data.t, data.WAMV.Xf(row,:)*scales(row));
             grid on;
             t = titles(row);
@@ -59,23 +40,6 @@ if (param.enabled(2))
             ylabel(ylabels(row), 'Interpreter', 'latex');
             xlabel(xlabels(row), 'Interpreter', 'latex');
             legend('True', 'Filtered - Distributed');
-        elseif mono_sub_switch == 1
-            plot(data.t, data.WAMV.X(row,:)*scales(row), data.t, data.MONO.Xf(row+15,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Monolithic');
-        elseif mono_sub_switch == 2
-            plot(data.t, data.WAMV.X(row,:)*scales(row), data.t, data.WAMV.Xf(row,:)*scales(row),data.t, data.MONO.Xf(row+15,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
-        end
     end
 end
 % --- QUAD ETA data
@@ -86,31 +50,13 @@ if (param.enabled(3))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + sum(param.enabled));
-        if mono_sub_switch == 0
-            plot(data.t, data.QUAD.X(row,:)*scales(row), data.t, data.QUAD.Xf(row,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Distributed');
-        elseif mono_sub_switch == 1
-            plot(data.t, data.QUAD.X(row,:)*scales(row), data.t, data.MONO.Xf(row+30,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Monolithic');
-        elseif mono_sub_switch == 2
-            plot(data.t, data.QUAD.X(row,:)*scales(row), data.t, data.QUAD.Xf(row,:)*scales(row),data.t, data.MONO.Xf(row+30,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
-        end
+        plot(data.t, data.QUAD.X(row,:)*scales(row), data.t, data.QUAD.Xf(row,:)*scales(row));
+        grid on;
+        t = titles(row);
+        title(t{:}, 'Interpreter', 'latex');
+        ylabel(ylabels(row), 'Interpreter', 'latex');
+        xlabel(xlabels(row), 'Interpreter', 'latex');
+        legend('True', 'Filtered - Distributed');
     end
 end
 % ---------- NU data
@@ -124,31 +70,13 @@ if (param.enabled(1))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + 1);
-        if mono_sub_switch == 0
-            plot(data.t, data.AUV.X(row+6,:)*scales(row), data.t, data.AUV.Xf(row+6,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Distributed');
-        elseif mono_sub_switch == 1
-            plot(data.t, data.AUV.X(row+6,:)*scales(row), data.t, data.MONO.Xf(row+6,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Monolithic');
-        elseif mono_sub_switch == 2
-            plot(data.t, data.AUV.X(row+6,:)*scales(row), data.t, data.AUV.Xf(row+6,:)*scales(row),data.t, data.MONO.Xf(row+6,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
-        end
+        plot(data.t, data.AUV.X(row+6,:)*scales(row), data.t, data.AUV.Xf(row+6,:)*scales(row));
+        grid on;
+        t = titles(row);
+        title(t{:}, 'Interpreter', 'latex');
+        ylabel(ylabels(row), 'Interpreter', 'latex');
+        xlabel(xlabels(row), 'Interpreter', 'latex');
+        legend('True', 'Filtered - Distributed');
     end
 end
 
@@ -160,31 +88,13 @@ if (param.enabled(2))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + sum(param.enabled(1:2)));
-        if mono_sub_switch == 0
-            plot(data.t, data.WAMV.X(row+6,:)*scales(row), data.t, data.WAMV.Xf(row+6,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Distributed');
-        elseif mono_sub_switch == 1
-            plot(data.t, data.WAMV.X(row+6,:)*scales(row), data.t, data.MONO.Xf(row+15+6,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Monolithic');
-        elseif mono_sub_switch == 2
-            plot(data.t, data.WAMV.X(row+6,:)*scales(row), data.t, data.WAMV.Xf(row+6,:)*scales(row),data.t, data.MONO.Xf(row+15+6,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
-        end
+        plot(data.t, data.WAMV.X(row+6,:)*scales(row), data.t, data.WAMV.Xf(row+6,:)*scales(row));
+        grid on;
+        t = titles(row);
+        title(t{:}, 'Interpreter', 'latex');
+        ylabel(ylabels(row), 'Interpreter', 'latex');
+        xlabel(xlabels(row), 'Interpreter', 'latex');
+        legend('True', 'Filtered - Distributed');
     end
 
 end
@@ -196,31 +106,13 @@ if (param.enabled(3))
     scales = [1,1,1,180/pi,180/pi,180/pi,1,1,1,180/pi,180/pi,180/pi]; 
     for row=1:rows
         subplot(rows,columns,(row-1)*columns + sum(param.enabled));
-        if mono_sub_switch == 0
-            plot(data.t, data.QUAD.X(row+6,:)*scales(row), data.t, data.QUAD.Xf(row+6,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Distributed');
-        elseif mono_sub_switch == 1
-            plot(data.t, data.QUAD.X(row+6,:)*scales(row), data.t, data.MONO.Xf(row+30+6,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Monolithic');
-        elseif mono_sub_switch == 2
-            plot(data.t, data.QUAD.X(row+6,:)*scales(row), data.t, data.QUAD.Xf(row+6,:)*scales(row),data.t, data.MONO.Xf(row+30+6,:)*scales(row));
-            grid on;
-            t = titles(row);
-            title(t{:}, 'Interpreter', 'latex');
-            ylabel(ylabels(row), 'Interpreter', 'latex');
-            xlabel(xlabels(row), 'Interpreter', 'latex');
-            legend('True', 'Filtered - Monolithic', 'Filtered - Distributed');
-        end
+        plot(data.t, data.QUAD.X(row+6,:)*scales(row), data.t, data.QUAD.Xf(row+6,:)*scales(row));
+        grid on;
+        t = titles(row);
+        title(t{:}, 'Interpreter', 'latex');
+        ylabel(ylabels(row), 'Interpreter', 'latex');
+        xlabel(xlabels(row), 'Interpreter', 'latex');
+        legend('True', 'Filtered - Distributed');
     end
 end
 
