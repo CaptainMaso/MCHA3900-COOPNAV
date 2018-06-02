@@ -46,7 +46,7 @@ param.HAP.sigma      = eye(3)*1e-4;       % Noise on HAP data (m)
 param.HAP.datalength = 3;
 
 % --- Simulation Parameters
-param.tf = 10;
+param.tf = 5;
 
 % --- Vehicle Uncertainties
 param.AUV.SQeta = diag([1e-2 1e-2 1e-2, deg2rad([20 20 20])])./param.sensor_sample_rate;
@@ -151,7 +151,7 @@ for ii = 0:param.maxDelay
                                             param.IMU.SQbias0, param.WAMV.SQeta);
 end
 
-for t = 1:data.MONO.N
+for t = 1:2%data.MONO.N
     dtt = tic;
     
     Xmono_pri  = nan(n*param.maxDelay,1);
@@ -265,15 +265,16 @@ for t = 1:data.MONO.N
     [Xf_mono, SPf_mono] = UKF_PU(Xf_mono, SPf_mono, [data.AUV.U(:,t);data.WAMV.U(:,t);data.QUAD.U(:,t)], f);
 
     % Full state disassembly
-    data.AUV.Xf([1:15, 16:21] + ii*21,t+1)                          = Xf_mono([1:15, 16:21] + ii*45);    
-    data.AUV.SPf([1:15, 16:21] + ii*21, [1:15, 16:21] + ii*21,t+1)  = SPf_mono([1:15,16:21] + ii*45,[1:15,16:21] + ii*45);
+    for ii = 0:param.maxDelay - 1
+        data.AUV.Xf([1:15, 16:21] + ii*21,t+1)                          = Xf_mono([1:15, 16:21] + ii*45);    
+        data.AUV.SPf([1:15, 16:21] + ii*21, [1:15, 16:21] + ii*21,t+1)  = SPf_mono([1:15,16:21] + ii*45,[1:15,16:21] + ii*45);
 
-    data.WAMV.Xf((1:15) + ii*15, t+1)                   = Xf_mono((16:30) + ii*45);            
-    data.WAMV.SPf((1:15) + ii*15,(1:15) + ii*15, t+1)   = SPf_mono((16:30) + ii*45,(16:30) + ii*45);
+        data.WAMV.Xf((1:15) + ii*15, t+1)                   = Xf_mono((16:30) + ii*45);            
+        data.WAMV.SPf((1:15) + ii*15,(1:15) + ii*15, t+1)   = SPf_mono((16:30) + ii*45,(16:30) + ii*45);
 
-    data.QUAD.Xf([1:15, 16:21] + ii*21,t+1)                         = Xf_mono([31:45, 16:21]  + ii*45);   
-    data.QUAD.SPf([1:15, 16:21] + ii*21,[1:15, 16:21] + ii*21, t+1) = SPf_mono([31:45,16:21]  + ii*45, [31:45,16:21]  + ii*45);
-    
+        data.QUAD.Xf([1:15, 16:21] + ii*21,t+1)                         = Xf_mono([31:45, 16:21]  + ii*45);   
+        data.QUAD.SPf([1:15, 16:21] + ii*21,[1:15, 16:21] + ii*21, t+1) = SPf_mono([31:45,16:21]  + ii*45, [31:45,16:21]  + ii*45);
+    end
     % TTF
     dt(1:29) = dt(2:30);
     dt(30) = toc(dtt);
