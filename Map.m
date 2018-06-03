@@ -1,4 +1,4 @@
-%% Initialise map and load bits
+a a%% Initialise map and load bits
 % Max and min and other elements
 map.max = [500,   500,  100]';          % (N,E,D) (m)
 map.min = [-500, -500, -100]';          % (N,E,D) (m)

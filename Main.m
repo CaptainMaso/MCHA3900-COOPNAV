@@ -151,7 +151,7 @@ for ii = 0:param.maxDelay
                                             param.IMU.SQbias0, param.WAMV.SQeta);
 end
 
-for t = 1:2%data.MONO.N
+for t = 1:data.MONO.N
     dtt = tic;
     
     Xmono_pri  = nan(n*param.maxDelay,1);
@@ -174,50 +174,42 @@ for t = 1:2%data.MONO.N
                % AUV Measurement Corrections
                case "AUV IMU"
                     asv = (1:21) + (k_n*21); % Active State Vector
-                    g_auv_imu = @(x,u) mm_AUV_IMU(x(1:12), u, x(13:15), x(16:21));            % AUV States: [AUV_eta; AUV_nu; AUV_gyrobias; WAMV_eta];
-                    [data.AUV.Xf(asv,t), data.AUV.SPf(asv,asv,t)]   = UKF_MU(Ydelay{ii,t}.data, data.AUV.Xf(asv,t), ...
-                                                                             data.AUV.SPf(asv,asv,t), data.AUV.U(:,t-k_n), g_auv_imu);                                       
+                    g_auv_imu = @(x,u) mm_AUV_IMU(x((1:12) + k_n*21), u, x((13:15) + k_n*21), x((16:21) + k_n*21));            % AUV States: [AUV_eta; AUV_nu; AUV_gyrobias; WAMV_eta];
+                    [data.AUV.Xf(:,t), data.AUV.SPf(:,:,t)]   = UKF_MU(Ydelay{ii,t}.data, data.AUV.Xf(:,t), ...
+                                                                             data.AUV.SPf(:,:,t), data.AUV.U(:,t-k_n), g_auv_imu);                                       
                case "AUV HAP"
-                    asv = (1:21) + (k_n*21); % Active State Vector
-                    g_auv_hap = @(x,u) mm_AUV_HAP(x(1:12), u, x(13:15), x(16:21));               % AUV States: [AUV_eta; AUV_nu; AUV_gyrobias; WAMV_eta];
-                    [data.AUV.Xf(asv,t), data.AUV.SPf(asv,asv,t)]   = UKF_MU(Ydelay{ii,t}.data, data.AUV.Xf(asv,t), ...
-                                                                             data.AUV.SPf(asv,asv,t), data.AUV.U(:,t-k_n), g_auv_hap);
+                    g_auv_hap = @(x,u) mm_AUV_HAP(x((1:12) + k_n*21), u, x((13:15) + k_n*21), x((16:21) + k_n*21));               % AUV States: [AUV_eta; AUV_nu; AUV_gyrobias; WAMV_eta];
+                    [data.AUV.Xf(:,t), data.AUV.SPf(:,:,t)]   = UKF_MU(Ydelay{ii,t}.data, data.AUV.Xf(:,t), ...
+                                                                             data.AUV.SPf(:,:,t), data.AUV.U(:,t-k_n), g_auv_hap);
                % WAMV Measurement Corrections
                case "WAMV IMU"
-                   asv = (1:15) + (k_n*15); % Active State Vector
-                   g_wamv_imu = @(x,u) mm_WAMV_IMU(x(1:12), u, x(13:15));               % WAMV States: [WAMV_eta; WAMV_nu; WAMV_gyrobias];
-                   [data.WAMV.Xf(asv,t), data.WAMV.SPf(asv,asv,t)]  = UKF_MU(Ydelay{ii,t}.data, data.WAMV.Xf(asv,t), ...
-                                                                             data.WAMV.SPf(asv,asv,t), data.WAMV.U(:,t-k_n), g_wamv_imu);
+                   g_wamv_imu = @(x,u) mm_WAMV_IMU(x((1:12) + k_n*15), u, x((13:15) + k_n*15));               % WAMV States: [WAMV_eta; WAMV_nu; WAMV_gyrobias];
+                   [data.WAMV.Xf(:,t), data.WAMV.SPf(:,:,t)]  = UKF_MU(Ydelay{ii,t}.data, data.WAMV.Xf(:,t), ...
+                                                                       data.WAMV.SPf(:,:,t), data.WAMV.U(:,t-k_n), g_wamv_imu);
                case "WAMV GPS"
-                   asv = (1:15) + (k_n*15); % Active State Vector
-                   g_wamv_gps = @(x,u) mm_WAMV_GPS(x(1:12), u, x(13:15));               % WAMV States: [WAMV_eta; WAMV_nu; WAMV_gyrobias];
-                   [data.WAMV.Xf(asv,t), data.WAMV.SPf(asv,asv,t)]  = UKF_MU(Ydelay{ii,t}.data, data.WAMV.Xf(asv,t), ...
-                                                                             data.WAMV.SPf(asv,asv,t), data.WAMV.U(:,t-k_n), g_wamv_gps);
+                   g_wamv_gps = @(x,u) mm_WAMV_GPS(x((1:12) + k_n*15), u, x((13:15) + k_n*15));               % WAMV States: [WAMV_eta; WAMV_nu; WAMV_gyrobias];
+                   [data.WAMV.Xf(:,t), data.WAMV.SPf(:,:,t)]  = UKF_MU(Ydelay{ii,t}.data, data.WAMV.Xf(:,t), ...
+                                                                       data.WAMV.SPf(:,:,t), data.WAMV.U(:,t-k_n), g_wamv_gps);
                case "WAMV VB"
-                    asv = (1:15) + (k_n*15); % Active State Vector
-                    g_wamv_vb = @(x,u) mm_WAMV_VB(x(1:12), u, x(13:15));               % WAMV States: [WAMV_eta; WAMV_nu; WAMV_gyrobias];
-                    [data.WAMV.Xf(asv,t), data.WAMV.SPf(asv,asv,t)]  = UKF_MU(Ydelay{ii,t}.data, data.WAMV.Xf(asv,t), ...
-                                                                             data.WAMV.SPf(asv,asv,t), data.WAMV.U(:,t-k_n), g_wamv_vb);
+                    g_wamv_vb = @(x,u) mm_WAMV_VB(x((1:12) + k_n*15), u, x((13:15) + k_n*15));               % WAMV States: [WAMV_eta; WAMV_nu; WAMV_gyrobias];
+                    [data.WAMV.Xf(:,t), data.WAMV.SPf(:,:,t)]  = UKF_MU(Ydelay{ii,t}.data, data.WAMV.Xf(:,t), ...
+                                                                             data.WAMV.SPf(:,:,t), data.WAMV.U(:,t-k_n), g_wamv_vb);
                % QUAD Measurement Corrections
                case "QUAD IMU"
-                    asv = (1:21) + (k_n*21); % Active State Vector
-                    g_quad_imu = @(x,u) mm_QUAD_IMU(x(1:12), u, x(13:15), x(16:21));    % QUAD States: [QUAD_eta; QUAD_nu; QUAD_gyrobias; WAMV_eta];
-                    [data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t)] = UKF_MU(Ydelay{ii,t}.data, data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t), data.QUAD.U(:,t-k_n), g_quad_imu);
+                    g_quad_imu = @(x,u) mm_QUAD_IMU(x((1:12) + k_n*21), u, x((13:15) + k_n*21), x((16:21) + k_n*21));    % QUAD States: [QUAD_eta; QUAD_nu; QUAD_gyrobias; WAMV_eta];
+                    [data.QUAD.Xf(:,t), data.QUAD.SPf(:,:,t)] = UKF_MU(Ydelay{ii,t}.data, data.QUAD.Xf(:,t), data.QUAD.SPf(:,:,t), data.QUAD.U(:,t-k_n), g_quad_imu);
 
                case "QUAD GPS"
-                    asv = (1:21) + (k_n*21); % Active State Vector
-                    g_quad_gps = @(x,u) mm_QUAD_GPS(x(1:12), u, x(13:15), x(16:21));    % QUAD States: [QUAD_eta; QUAD_nu; QUAD_gyrobias; WAMV_eta];
-                    [data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t)] = UKF_MU(Ydelay{ii,t}.data, data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t), data.QUAD.U(:,t-k_n), g_quad_gps);
+                    g_quad_gps = @(x,u) mm_QUAD_GPS(x((1:12) + k_n*21), u, x((13:15) + k_n*21), x((16:21) + k_n*21));    % QUAD States: [QUAD_eta; QUAD_nu; QUAD_gyrobias; WAMV_eta];
+                    [data.QUAD.Xf(:,t), data.QUAD.SPf(:,:,t)] = UKF_MU(Ydelay{ii,t}.data, data.QUAD.Xf(:,t), data.QUAD.SPf(:,:,t), data.QUAD.U(:,t-k_n), g_quad_gps);
 
                case "QUAD VB"
-                   asv = (1:21) + (k_n*21); % Active State Vector
-                   g_quad_vb = @(x,u) mm_QUAD_VB(x(1:12), u, x(13:15), x(16:21));    % QUAD States: [QUAD_eta; QUAD_nu; QUAD_gyrobias; WAMV_eta];
-                   [data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t)] = UKF_MU(Ydelay{ii,t}.data, data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t), data.QUAD.U(:,t-k_n), g_quad_vb);
+                   g_quad_vb = @(x,u)   mm_QUAD_VB(x((1:12) + k_n*21), u, x((13:15) + k_n*21), x((16:21) + k_n*21));    % QUAD States: [QUAD_eta; QUAD_nu; QUAD_gyrobias; WAMV_eta];
+                   [data.QUAD.Xf(:,t), data.QUAD.SPf(:,:,t)] = UKF_MU(Ydelay{ii,t}.data, data.QUAD.Xf(:,t), data.QUAD.SPf(:,:,t), data.QUAD.U(:,t-k_n), g_quad_vb);
 
                case "QUAD LPS"
-                   asv = (1:21) + (k_n*21); % Active State Vector
-                   g_quad_lps = @(x,u) mm_QUAD_LPS(x(1:12), u, x(13:15), x(16:21));    % QUAD States: [QUAD_eta; QUAD_nu; QUAD_gyrobias; WAMV_eta];
-                   [data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t)] = UKF_MU(Ydelay{ii,t}.data, data.QUAD.Xf(asv,t), data.QUAD.SPf(asv,asv,t), data.QUAD.U(:,t-k_n), g_quad_lps);
+                   g_quad_lps = @(x,u)  mm_QUAD_LPS(x((1:12) + k_n*21), u, x((13:15) + k_n*21), x((16:21) + k_n*21));    % QUAD States: [QUAD_eta; QUAD_nu; QUAD_gyrobias; WAMV_eta];
+                   [data.QUAD.Xf(:,t), data.QUAD.SPf(:,:,t)] = UKF_MU(Ydelay{ii,t}.data, data.QUAD.Xf(:,t), data.QUAD.SPf(:,:,t), data.QUAD.U(:,t-k_n), g_quad_lps);
 
                otherwise
                    error('Who the fuck wrote this code');
@@ -257,6 +249,8 @@ for t = 1:2%data.MONO.N
             Xf_mono((1:45) + ii*45)     = SPf_mono((1:45) + ii*45, (1:45) + ii*45)...
                                           *(SPfm_auv\Xfm_auv + SPfm_wamv\Xfm_wamv + SPfm_quad\Xfm_quad...
                                           - 2*(SPmono_pri((1:45) + ii*45, (1:45) + ii*45))\Xmono_pri((1:45) + ii*45));
+        else
+            error('Not full rank');
         end
     end
     
