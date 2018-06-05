@@ -20,7 +20,7 @@ param.enabled = [1,1,1]; % AUV, WAMV, QUAD
 param.g = 9.81;
 
 % --- Sensor Parameters
-param.sensor_sample_rate = 100;  % Sample rate (Hz)
+param.sensor_sample_rate = 200;  % Sample rate (Hz)
 
 % ---- LPS parameters
 param.LPS.sigma = 1e-4;          % Noise on LPS data (m)
@@ -38,7 +38,7 @@ param.IMU.magn_sigma = eye(3)*1e-3;
 param.IMU.datalength = 9;
 
 % ---- GPS parameters
-param.GPS.sigma      = eye(3)*1e-1;       % Noise on gps data (m)
+param.GPS.sigma      = eye(3)*1e-2;       % Noise on gps data (m)
 param.GPS.datalength = 3;
 
 % ---- HAP parameters
@@ -49,11 +49,11 @@ param.HAP.datalength = 3;
 param.tf = 10;
 
 % --- Vehicle Uncertainties
-param.AUV.SQeta = diag([1e-2 1e-2 1e-2, deg2rad([20 20 20])])./param.sensor_sample_rate;
-param.AUV.SQnu  = diag([1e0 1e0 1e0,  deg2rad([40 40 40])])./param.sensor_sample_rate;
+param.AUV.SQeta = diag([1e-3 1e-3 1e-3, deg2rad([20 20 20])])./param.sensor_sample_rate;
+param.AUV.SQnu  = diag([1e-2 1e-2 1e-2,  deg2rad([40 40 40])])./param.sensor_sample_rate;
 
-param.WAMV.SQeta = diag([1e-2 1e-2 2e-2, deg2rad([15 15 5])])./param.sensor_sample_rate;
-param.WAMV.SQnu  = diag([5e-1 5e-1 5e0  deg2rad([3e3 3e3 25])])./param.sensor_sample_rate;
+param.WAMV.SQeta = diag([1e-2 1e-2 1e-2, deg2rad([15 15 5])])./param.sensor_sample_rate;
+param.WAMV.SQnu  = diag([5e-1 5e-1 5e-1  deg2rad([3e3 3e3 25])])./param.sensor_sample_rate;
 
 param.QUAD.SQeta = diag([1e-2 1e-2 1e-2, deg2rad([1 1 1])])./param.sensor_sample_rate;
 param.QUAD.SQnu  = diag([2e1 2e1 2e2, deg2rad([5 5 5])])./param.sensor_sample_rate;

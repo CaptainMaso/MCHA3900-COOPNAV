@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.74"
+    ComputedModelVersion    "1.75"
     NumModelReferences	    0
     NumTestPointedSignals   0
     NumProvidedFunctions    0
@@ -56,7 +56,7 @@ Model {
       $ObjectID		      2
       $ClassName	      "Simulink.WindowInfo"
       IsActive		      [1]
-      Location		      [-681.0, 129.0, 1935.0, 1055.0]
+      Location		      [418.0, 93.0, 1935.0, 1055.0]
       Object {
 	$PropName		"ModelBrowserInfo"
 	$ObjectID		3
@@ -80,9 +80,9 @@ Model {
 	IsActive		[1]
 	ViewObjType		"SimulinkTopLevel"
 	LoadSaveID		"0"
-	Extents			[2825.0, 1335.0]
-	ZoomFactor		[0.99999999999999989]
-	Offset			[-43.597679149009878, 63.353643737574657]
+	Extents			[1881.0, 874.0]
+	ZoomFactor		[0.99999999999999978]
+	Offset			[-43.597679149009991, 29.403644226332744]
       }
       Object {
 	$PropName		"DockComponentsInfo"
@@ -95,18 +95,18 @@ Model {
 	UserData		""
 	Floating		[0]
 	DockPosition		"Right"
-	Width			[426]
-	Height			[320]
+	Width			[640]
+	Height			[480]
       }
       WindowState	      "AAAA/wAAAAD9AAAAAgAAAAAAAAC9AAAB+PwCAAAAA/sAAAAWAEQAbwBjAGsAVwBpAGQAZwBlAHQAMwEAAAAxAAAB+AAAA"
       "AAAAAAA+wAAABYARABvAGMAawBXAGkAZABnAGUAdAA0AAAAAAD/////AAAAAAAAAAD7AAAAUgBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0Ac"
-      "ABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQAAAAAAP////8AAACSAP///wAAAAEAAAAAAAAAAPwCA"
+      "ABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQAAAAAAP////8AAABjAP///wAAAAEAAAAAAAAAAPwCA"
       "AAAAfsAAABUAEcATABVAEUAMgA6AFAAcgBvAHAAZQByAHQAeQBJAG4AcwBwAGUAYwB0AG8AcgAvAFAAcgBvAHAAZQByAHQAeQAgAEkAbgBzAHAAZ"
-      "QBjAHQAbwByAAAAAAD/////AAAAPQD///8AAAtBAAAFhQAAAAEAAAACAAAAAQAAAAL8AAAAAQAAAAIAAAAP/////wAAAAAA/////wAAAAAAAAAA/"
+      "QBjAHQAbwByAAAAAAD/////AAAAKwD///8AAAd/AAADowAAAAEAAAACAAAAAQAAAAL8AAAAAQAAAAIAAAAP/////wAAAAAA/////wAAAAAAAAAA/"
       "////wEAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/"
-      "////wEAAACp/////wAAAAAAAAAA/////wEAAAEu/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAHX/////wAAAAAAAAAA/"
-      "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAR7/////wAAAAAAAAAA/"
-      "////wEAAAS8/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA"
+      "////wEAAAB5/////wAAAAAAAAAA/////wEAAADa/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAFT/////wAAAAAAAAAA/"
+      "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAMr/////wAAAAAAAAAA/"
+      "////wEAAANa/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA"
     }
   }
   HideAutomaticNames	  on
@@ -114,11 +114,11 @@ Model {
   Creator		  "tristan"
   UpdateHistory		  "UpdateHistoryNever"
   ModifiedByFormat	  "%<Auto>"
-  LastModifiedBy	  "masom"
+  LastModifiedBy	  "Sam"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Wed May 30 16:48:08 2018"
-  RTWModifiedTimeStamp	  449599651
-  ModelVersionFormat	  "1.%<AutoIncrement:74>"
+  LastModifiedDate	  "Sun Jun 03 19:48:48 2018"
+  RTWModifiedTimeStamp	  449956123
+  ModelVersionFormat	  "1.%<AutoIncrement:75>"
   SampleTimeColors	  on
   SampleTimeAnnotations	  on
   LibraryLinkDisplay	  "none"
@@ -1818,7 +1818,7 @@ Model {
   }
   System {
     Name		    "WAMVmodel"
-    Location		    [-681, 129, 1254, 1184]
+    Location		    [418, 93, 2353, 1148]
     Open		    on
     PortBlocksUseCompactNotation off
     SetDomainSpec	    off
@@ -1987,6 +1987,7 @@ Model {
       Ports		      [1, 1]
       Position		      [320, 110, 390, 140]
       ZOrder		      289
+      Commented		      "on"
       MATLABFcn		      "inputDisturbance"
     }
     Block {
@@ -2105,6 +2106,7 @@ Model {
       Position		      [290, 98, 295, 152]
       ZOrder		      288
       ShowName		      off
+      Commented		      "on"
       Inputs		      "3"
       DisplayOption	      "bar"
     }
@@ -2407,6 +2409,7 @@ Model {
       Ports		      [0, 1]
       Position		      [210, 75, 240, 105]
       ZOrder		      284
+      Commented		      "on"
       Amplitude		      "0.1"
       SampleTime	      "0"
     }
@@ -2417,6 +2420,7 @@ Model {
       Ports		      [0, 1]
       Position		      [210, 110, 240, 140]
       ZOrder		      285
+      Commented		      "on"
       Amplitude		      "0.1"
       SampleTime	      "0"
     }
@@ -2427,6 +2431,7 @@ Model {
       Ports		      [0, 1]
       Position		      [210, 150, 240, 180]
       ZOrder		      286
+      Commented		      "on"
       Amplitude		      "0.1"
       SampleTime	      "0"
     }
