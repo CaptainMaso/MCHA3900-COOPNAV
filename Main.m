@@ -52,8 +52,8 @@ param.tf = 10;
 param.AUV.SQeta = diag([1e-3 1e-3 1e-3, deg2rad([20 20 20])])./param.sensor_sample_rate;
 param.AUV.SQnu  = diag([1e-2 1e-2 1e-2,  deg2rad([40 40 40])])./param.sensor_sample_rate;
 
-param.WAMV.SQeta = diag([1e-2 1e-2 1e-2, deg2rad([15 15 5])])./param.sensor_sample_rate;
-param.WAMV.SQnu  = diag([5e-1 5e-1 5e-1  deg2rad([3e3 3e3 25])])./param.sensor_sample_rate;
+param.WAMV.SQeta = diag([1e-2 1e-2 1e-1, deg2rad([60 60 5])])./param.sensor_sample_rate;
+param.WAMV.SQnu  = diag([5e-1 5e-1 5e0  deg2rad([1e1 1e1 25])])./param.sensor_sample_rate;
 
 param.QUAD.SQeta = diag([1e-2 1e-2 1e-2, deg2rad([1 1 1])])./param.sensor_sample_rate;
 param.QUAD.SQnu  = diag([2e1 2e1 2e2, deg2rad([5 5 5])])./param.sensor_sample_rate;
@@ -165,11 +165,11 @@ for t = 1:data.MONO.N
     disp(['ETA data gen: ' num2str(ttf(1), '%.0f') 'm ' num2str(ttf(2), '%.2f') 's'])
 end
 
-%% KALMAN FILTER THE FUCK OUT OF SHIT
+%% Estimation
 mono_sub_switch = 2;            % 0 = Sub 1 = Mono;  2 = both/compare
 
 if mono_sub_switch ~= 0 && mono_sub_switch ~= 1 && mono_sub_switch ~= 2
-    error('mono_sub_switch must be 0, 1, or 2, dumbass');
+    error('mono_sub_switch must be 0, 1, or 2');
 end
 
 N = size(data.QUAD.Y,2);     % Length of data

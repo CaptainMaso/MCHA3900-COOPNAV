@@ -1,7 +1,7 @@
 %% Initialise map and load bits
 % Max and min and other elements
-map.max = [25,   25,  25]';          % (N,E,D) (m)
-map.min = [-25, -25, -25]';          % (N,E,D) (m)
+map.max = [100,   100,  25]';          % (N,E,D) (m)
+map.min = [-100, -100, -25]';          % (N,E,D) (m)
 
 % First bits to load are the LPS tags
 map.LPS.N = 3;
